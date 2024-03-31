@@ -64,6 +64,13 @@ const clientSchema = new mongoose.Schema({
     planIds: {
         type: [String]
     },
+    subscribedPlanIds: {
+        type: [{
+            planId: String,
+            subscriptionDate: Date,
+            subscriptionExpires: Date,
+        }]
+    },
     advisorIds: {
         type: [String]
     },

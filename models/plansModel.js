@@ -2,7 +2,15 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const keyValueSchema = new mongoose.Schema({
-    stockName: String,
+    stock: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stock'
+    },
+    dateOfBuying: {
+        type: Date,
+        default: Date.now()
+    },
+    dateOfSelling: Date,
     contri: Number
 });
 
@@ -64,12 +72,29 @@ const plansSchema = new mongoose.Schema({
     photo: {
         data: Buffer, // Store image data as buffer
         contentType: String // Store image content type
+    },
+    isPremium: {
+        type: Boolean,
+        default: false
     }
 }, {
     collection: "plans",
     versionKey: false,
     timestamps: true
 });
+
+plansSchema.methods.calculateWeightedCAGR1Y = function() {
+    let weightedSumCAGR = 0;
+
+    // Calculate weighted sum of CAGR
+    this.stocks.forEach(stock => {
+        weightedSumCAGR += stock.contri * stock.stockId.CAGR1Y;
+    });
+
+    // Calculate weighted CAGR1Y
+    const weightedCAGR1Y = weightedSumCAGR;
+    return weightedCAGR1Y;
+};
 
 const Plan = mongoose.model('Plan', plansSchema);
 module.exports = Plan;

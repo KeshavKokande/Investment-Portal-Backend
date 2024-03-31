@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+const stocksDataUpload = require("./populateStocks/stocksData"); 
+
 const checkAuthRouter = require('./routes/checkAuthRoutes');
 const advisorRouter = require("./routes/advisorRoutes");
 const clientRouter = require("./routes/clientRoutes");
@@ -36,10 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(cookieParser());
-app.use('/', (req, res, next) => {
-    // console.log('Cookies: ', req.cookies);
-    next();
-})
+app.use('/stocksUpload', stocksDataUpload.fillStocks);
 app.use('/api/v1/check-auth', checkAuthRouter);
 app.use('/api/v1/advisor', advisorRouter);
 app.use('/api/v1/client', clientRouter);

@@ -80,7 +80,9 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
     let token;
     if(req.cookies && req.cookies.jwt){
         token = req.cookies.jwt;
+        console.log("Checking cookie: ");
     } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        console.log("Checking headers: ");
         token = req.headers.authorization.split(' ')[1];
     }
 
@@ -125,7 +127,7 @@ exports.logout = (req, res, next) => {
     };
 
     // Set the cookie 'jwt' with an expired date, effectively deleting it
-    res.cookie('jwt', 'loggedout', cookieOptions);
+    res.cookie('jwt', '', cookieOptions);
     res.status(200).json({ 
         status: 'success',
         message: 'Logged Out !!! :)'
