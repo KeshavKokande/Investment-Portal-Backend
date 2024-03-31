@@ -43,7 +43,6 @@ app.use('/api/v1/check-auth', checkAuthRouter);
 app.use('/api/v1/advisor', advisorRouter);
 app.use('/api/v1/client', clientRouter);
 
-
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find the URL: ${req.originalUrl} in this server! :(`, 404));
 })

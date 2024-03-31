@@ -76,6 +76,13 @@ const plansSchema = new mongoose.Schema({
     isPremium: {
         type: Boolean,
         default: false
+    },
+    subscribedClientIds: {
+        type: [String],
+        default: [],
+        required: function() {
+            return this.isPremium === true;
+        }
     }
 }, {
     collection: "plans",
