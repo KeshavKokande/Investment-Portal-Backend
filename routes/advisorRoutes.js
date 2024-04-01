@@ -16,5 +16,6 @@ router.get('/get-no-of-clients', authController.protect, authController.restrict
 router.get('/get-total-invested-amount', authController.protect, authController.restrictTo('advisor'), advisorController.totalCummulativeInvestedAmounts);
 router.get('/get-total-current-profit', authController.protect, authController.restrictTo('advisor'), advisorController.cummulativeCurrentProfit);
 router.patch('/deletePlan/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.deletePlan);
+router.get('/get-all-stocks', authController.protect, authController.restrictTo('advisor'), advisorController.getAllStocks);
 
 module.exports = router;

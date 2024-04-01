@@ -4,6 +4,7 @@ const Advisor = require("./../models/advisorModel");
 const Client = require("./../models/clientModel");
 const Plan = require('./../models/plansModel');
 const Transaction = require("./../models/transactionModel");
+const Stock = require('./../models/stocksModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 
@@ -200,4 +201,28 @@ const plan = await Plan.findById(planId);
     plan.isActive = !plan.isActive;    
     await plan.save();     
     res.status(200).json({status:'success', message: plan.isActive ?"Plan Activated !!! :)": "Plan Deactivated !!! :(",plan}); 
+})
+
+exports.getAllStocks = asyncErrorHandler(async (req, res, next) => {
+    const date = req.body.date;
+
+    const stocks = await Stock.aggregate([
+        {
+            $project: {
+                symbol: 1,
+                historical: {
+                    $filter: {
+                        input: "$historical",
+                        as: "history",
+                        cond: { $eq: ["$$history.date", date] }
+                    }
+                }
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        status: 'success',
+        stocks
+    })
 })
