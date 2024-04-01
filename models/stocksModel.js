@@ -7,23 +7,26 @@ const stockSchema = new mongoose.Schema({
         unique: true,
         uppercase: true
     },
-    historical: [
-      {
-        date: String,
-        open: Number,
-        high: Number,
-        low: Number,
-        close: Number,
-        adjClose: Number,
-        volume: Number,
-        unadjustedVolume: Number,
-        change: Number,
-        changePercent: Number,
-        vwap: Number,
-        label: String,
-        changeOverTime: Number,
-      },
-    ],
+    historical: {
+      type: [
+        {
+          date: String,
+          open: Number,
+          high: Number,
+          low: Number,
+          close: Number,
+          adjClose: Number,
+          volume: Number,
+          unadjustedVolume: Number,
+          change: Number,
+          changePercent: Number,
+          vwap: Number,
+          label: String,
+          changeOverTime: Number,
+        },
+      ],
+      select: false
+    },
 }, {
     collection: "stocks",
     versionKey: false,

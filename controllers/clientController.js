@@ -5,6 +5,7 @@ const Advisor = require("../models/advisorModel");
 const Plan = require("../models/plansModel");
 const Transaction = require("../models/transactionModel");
 
+const notification = require("./../utils/notification");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const AppError = require('../utils/appError');
 
@@ -96,10 +97,10 @@ exports.buyAPlan = asyncErrorHandler( async(req, res, next) => {
         return next(new AppError('This plan u already buied u moron!!! (⩺_⩹)', 400));
     }
 
-    const planStatsObj = plan.stocks.map(stock => ({
-        stockName: stock.stockName,
-        contriAmount: (stock.contri / 100) * req.body.investedAmount
-    }));
+    // const planStatsObj = plan.stocks.map(stock => ({
+    //     stockName: stock.stockName,
+    //     contriAmount: (stock.contri / 100) * req.body.investedAmount
+    // }));
 
     const transaction = await Transaction.create({
         planId,
@@ -108,7 +109,7 @@ exports.buyAPlan = asyncErrorHandler( async(req, res, next) => {
         clientId : client._id,
         clientName: client.name,
         investedAmount: req.body.investedAmount,
-        planStats: planStatsObj
+        // planStats: planStatsObj
     });
 
     if(!advisor.clientIds){
@@ -140,7 +141,7 @@ exports.buyAPlan = asyncErrorHandler( async(req, res, next) => {
 
     plan.noOfSubscription += 1;
     await plan.save();
-    
+    notification.triggerNotification(`${client.name} bought your plan, ${plan.name}`, client.userIdCredentials, advisor.userIdCredentials);
     res.status(201).json({
         status: 'success',
         transaction

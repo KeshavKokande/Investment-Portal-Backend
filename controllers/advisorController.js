@@ -28,20 +28,18 @@ exports.addPlan = asyncErrorHandler(async (req, res, next) => {
     const planObj = {...req.body};
     const advisorId = await Advisor.findOne({userIdCredentials: req.user._id});
     planObj.advisorId = advisorId._id;
-    planObj.photo = {
-        data: new Buffer.from(req.body.photo.data, 'base64'),
-        contentType: req.body.photo.contentType
-    };
+    planObj.stocks
+    // planObj.photo = {
+    //     data: new Buffer.from(req.body.photo.data, 'base64'),
+    //     contentType: req.body.photo.contentType
+    // };
 
     const plan = await Plan.create({...planObj});
-
+    
     res.status(201).json({
         status: 'success',
-        data: {
-            plan
-        }
-    });
-    
+        plan
+    })
     // res.redirect('/api/v1/check-auth/welcome-advisor');
 });
 
@@ -49,23 +47,24 @@ exports.listOfPlans = asyncErrorHandler(async (req, res, next) => {
     const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
     const plans = await Plan.find({ advisorId: advisor._id });
 
-    const plansWithRandomValues = plans.map(plan => {
-        const planWithRandomValues = plan.toObject(); // Convert Mongoose document to plain JavaScript object
-        planWithRandomValues.stocks = plan.stocks.map(stock => {
-            const randomMultiplier = (Math.random() * (0.05 + 0.03) - 0.03) * 100;
-            const currentDayValue = randomMultiplier.toFixed(2); // Limiting to 2 decimal places
-            return {
-                ...stock.toObject(), // Convert Mongoose document to plain JavaScript object
-                currentDayValue
-            };
-        });
-        return planWithRandomValues;
-    });
+    // const plansWithRandomValues = plans.map(plan => {
+    //     const planWithRandomValues = plan.toObject(); // Convert Mongoose document to plain JavaScript object
+    //     planWithRandomValues.stocks = plan.stocks.map(stock => {
+    //         const randomMultiplier = (Math.random() * (0.05 + 0.03) - 0.03) * 100;
+    //         const currentDayValue = randomMultiplier.toFixed(2); // Limiting to 2 decimal places
+    //         return {
+    //             ...stock.toObject(), // Convert Mongoose document to plain JavaScript object
+    //             currentDayValue
+    //         };
+    //     });
+    //     return planWithRandomValues;
+    // });
 
     res.status(200).json({
         status: 'success',
-        plans: plansWithRandomValues
+        plans
     });
+    // plansWithRandomValues
 });
 
 
