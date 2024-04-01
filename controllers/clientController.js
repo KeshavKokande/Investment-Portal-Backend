@@ -141,7 +141,7 @@ exports.buyAPlan = asyncErrorHandler( async(req, res, next) => {
 
     plan.noOfSubscription += 1;
     await plan.save();
-    notification.triggerNotification(`${client.name} bought your plan, ${plan.name}`, client.userIdCredentials, advisor.userIdCredentials);
+    notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     res.status(201).json({
         status: 'success',
         transaction

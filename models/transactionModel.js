@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const keyValueSchema = new mongoose.Schema({
-    stockName: String,
-    contriAmount: Number
-});
+// const keyValueSchema = new mongoose.Schema({
+//     stockName: String,
+//     contriAmount: Number
+// });
 
 const transactionSchema = new mongoose.Schema({
     planId: {
@@ -30,7 +30,7 @@ const transactionSchema = new mongoose.Schema({
     investedAmount: {
         type: Number,
         required: [true, 'Need to know how much u r investing !']
-    },
+    }
     // planStats: {
     //     type: [keyValueSchema],
     //     validate: {
