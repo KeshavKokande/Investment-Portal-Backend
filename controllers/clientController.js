@@ -4,6 +4,7 @@ const Client = require("../models/clientModel");
 const Advisor = require("../models/advisorModel");
 const Plan = require("../models/plansModel");
 const Transaction = require("../models/transactionModel");
+const Notification = require("../models/notificationModel");
 
 const notification = require("./../utils/notification");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
@@ -262,5 +263,14 @@ exports.editProfile = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         updatedClient
+    });
+})
+
+exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
+    const notifications = await Notification.find({ recipient: req.user._id });
+
+    res.status(200).json({
+        status: 'success',
+        notifications
     });
 })
