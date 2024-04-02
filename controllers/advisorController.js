@@ -30,6 +30,8 @@ exports.addPlan = asyncErrorHandler(async (req, res, next) => {
     const advisorId = await Advisor.findOne({userIdCredentials: req.user._id});
     planObj.advisorId = advisorId._id;
     planObj.stocks
+
+    console.log(planObj);
     // planObj.photo = {
     //     data: new Buffer.from(req.body.photo.data, 'base64'),
     //     contentType: req.body.photo.contentType
@@ -204,7 +206,9 @@ const plan = await Plan.findById(planId);
 })
 
 exports.getAllStocks = asyncErrorHandler(async (req, res, next) => {
-    const date = req.body.date;
+    const date = req.body.date || "2022-03-07";
+
+    console.log(date);
 
     const stocks = await Stock.aggregate([
         {

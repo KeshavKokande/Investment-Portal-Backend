@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const keyValueSchema = new mongoose.Schema({
-    stock: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Stock'
-    },
-    stockName: String,
+    // stock: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Stock'
+    // },
+    symbol: String,
     dateOfBuying: {
         type: Date,
         default: Date.now()
     },
-    quant: {
+    qty: {
         type: Number
     }
 });
@@ -69,6 +69,10 @@ const plansSchema = new mongoose.Schema({
     CAGR: {
         type: [Number],
         default: [0, 0, 0, 0, 0]
+    },
+    cash:{
+        type: Number, 
+        default: 0
     }
 }, {
     collection: "plans",
