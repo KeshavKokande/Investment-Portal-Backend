@@ -33,10 +33,10 @@ exports.addPlan = asyncErrorHandler(async (req, res, next) => {
     planObj.stocks
 
     console.log(planObj);
-    // planObj.photo = {
-    //     data: new Buffer.from(req.body.photo.data, 'base64'),
-    //     contentType: req.body.photo.contentType
-    // };
+    planObj.photo = {
+        data: new Buffer.from(req.body.photo.data, 'base64'),
+        contentType: req.body.photo.contentType
+    };
 
     const plan = await Plan.create({...planObj});
     
