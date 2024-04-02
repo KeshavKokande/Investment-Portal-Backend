@@ -5,6 +5,7 @@ const Client = require("./../models/clientModel");
 const Plan = require('./../models/plansModel');
 const Transaction = require("./../models/transactionModel");
 const Stock = require('./../models/stocksModel');
+const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 
