@@ -55,9 +55,9 @@ const plansSchema = new mongoose.Schema({
         data: Buffer, // Store image data as buffer
         contentType: String // Store image content type
     },
-    isPremium: { // I/O
-        type: Boolean,
-        default: false
+    planFees: {
+        type: Number,
+        default: 0
     },
     subscribedClientIds: {
         type: [String],

@@ -17,7 +17,7 @@ router.get('/get-total-invested-amount', authController.protect, authController.
 router.get('/get-total-current-profit', authController.protect, authController.restrictTo('advisor'), advisorController.cummulativeCurrentProfit);
 router.patch('/deletePlan/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.deletePlan);
 router.get('/get-all-stocks', authController.protect, authController.restrictTo('advisor'), advisorController.getAllStocks);
-router.patch('/edit-stocks/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.editStocks);
+router.patch('/edit-stocks/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.editPlan);
 router.get('/get-plan-details/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.getPlan);
 router.get('/get-all-notifications', authController.protect, authController.restrictTo('advisor'), advisorController.getAllNotification);
 
