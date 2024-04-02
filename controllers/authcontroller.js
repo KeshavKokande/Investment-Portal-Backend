@@ -290,6 +290,8 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     const user = await User.findById(req.user);
     const registeredUser = await Client.findOne({ userIdCredentials: user._id });
     if(!registeredUser){
+        res.cookie('name',user.name);
+        res.cookie('email',user.email);
         res.redirect("http://localhost:3000/clform");
     } else {
         res.redirect("http://localhost:3000/cldash")
