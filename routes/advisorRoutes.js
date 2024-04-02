@@ -19,5 +19,6 @@ router.patch('/deletePlan/:planId', authController.protect, authController.restr
 router.get('/get-all-stocks', authController.protect, authController.restrictTo('advisor'), advisorController.getAllStocks);
 router.patch('/edit-stocks/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.editStocks);
 router.get('/get-plan-details/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.getPlan);
+router.get('/get-all-notifications', authController.protect, authController.restrictTo('advisor'), advisorController.getAllNotification);
 
 module.exports = router;

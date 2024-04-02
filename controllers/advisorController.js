@@ -254,3 +254,12 @@ exports.getPlan = asyncErrorHandler(async (req, res, next) => {
         plan
     });
 })
+
+exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
+    const notifications = await Notification.find({ recipient: req.user._id });
+
+    res.status(200).json({
+        status: 'success',
+        notifications
+    });
+})
