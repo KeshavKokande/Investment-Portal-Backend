@@ -230,3 +230,27 @@ exports.getAllStocks = asyncErrorHandler(async (req, res, next) => {
         stocks
     })
 })
+
+exports.editStocks = asyncErrorHandler(async (req, res, next) => {
+
+    const stocksArray = req.body.stocks;
+    const planId = req.params.planId;
+
+    const plan = await Plan.findByIdAndUpdate(planId, {stocks: stocksArray}, { new: true });
+
+    res.status(200).json({
+        status: 'success',
+        plan
+    });
+})
+
+exports.getPlan = asyncErrorHandler(async (req, res, next) => {
+    const planId = req.params.planId;
+
+    const plan = await Plan.findById(planId);
+
+    res.status(200).json({
+        status: 'success',
+        plan
+    });
+})
