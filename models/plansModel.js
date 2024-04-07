@@ -13,6 +13,10 @@ const keyValueSchema = new mongoose.Schema({
     },
     qty: {
         type: Number
+    },
+
+    price:{
+        type: Number
     }
 });
 
