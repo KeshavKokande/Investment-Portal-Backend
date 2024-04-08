@@ -295,7 +295,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
     const  plan = await Plan.findById(planId);
     planObj.stocks = calculateNewAvgPrice(plan.stocks, planObj.stocks);
 
-    const updatedPlan = await Plan.findByIdAndUpdate(planId, {planObj}, { new: true });
+    const updatedPlan = await Plan.findByIdAndUpdate(planId, planObj, { new: true });
 
     res.status(200).json({
         status: 'success',
