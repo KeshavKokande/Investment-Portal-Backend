@@ -9,6 +9,61 @@ const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 
+// Edit
+// 1. Existing Stock qty === 0, it should be deleted
+// 2. Existing Stock qty decreased than previous
+// 3. Existing Stock qty increased than previous
+
+function calculateNewAvgPrice(stocks, updatedStocks) {
+    const newStocks = [];
+    const processedSymbols = {};
+    
+    for (const updatedStock of updatedStocks) {
+        const { symbol, qty, price: avgPrice } = updatedStock;
+        
+        if (processedSymbols[symbol]) {
+            continue;
+        }
+        
+        processedSymbols[symbol] = true;
+        
+        let foundStock = false;
+        for (const stock of stocks) {
+            if (stock.symbol === symbol) {
+                foundStock = true;
+                const { qty: oldQty, price: oldAvgPrice } = stock;
+                
+                if (qty > oldQty) {
+                    const newQty = qty;
+                    const newAvgPrice = ((oldQty * oldAvgPrice) + ((qty - oldQty) * avgPrice)) / newQty;
+                    
+                    newStocks.push({
+                        symbol,
+                        qty: newQty,
+                        price: newAvgPrice
+                    });
+                } else {
+                    newStocks.push({
+                        symbol,
+                        qty,
+                        price: oldAvgPrice
+                    });
+                }
+            }
+        }
+        
+        if (!foundStock) {
+            newStocks.push({
+                symbol,
+                qty,
+                price: avgPrice
+            });
+        }
+    }
+    
+    return newStocks;
+}
+
 exports.register = asyncErrorHandler(async (req, res, next) => {
 
     const advisorObj = {...req.body};
@@ -237,11 +292,14 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
     const planObj = {...req.body};
     const planId = req.params.planId;
 
-    const plan = await Plan.findByIdAndUpdate(planId, {planObj}, { new: true });
+    const  plan = await Plan.findById(planId);
+    planObj.stocks = calculateNewAvgPrice(plan.stocks, planObj.stocks);
+
+    const updatedPlan = await Plan.findByIdAndUpdate(planId, {planObj}, { new: true });
 
     res.status(200).json({
         status: 'success',
-        plan
+        updatedPlan
     });
 })
 

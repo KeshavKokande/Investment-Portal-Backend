@@ -2,19 +2,14 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const keyValueSchema = new mongoose.Schema({
-    // stock: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Stock'
-    // },
     symbol: String,
-    dateOfBuying: {
-        type: Date,
-        default: Date.now()
-    },
+    // dateOfBuying: {
+    //     type: Date,
+    //     default: Date.now()
+    // },
     qty: {
         type: Number
     },
-
     price:{
         type: Number
     }
@@ -70,10 +65,10 @@ const plansSchema = new mongoose.Schema({
             return this.isPremium === true;
         }
     },
-    CAGR: {
-        type: [Number],
-        default: [0, 0, 0, 0, 0]
-    },
+    // CAGR: {
+    //     type: [Number],
+    //     default: [0, 0, 0, 0, 0]
+    // },
     cash:{
         type: Number, 
         default: 0
