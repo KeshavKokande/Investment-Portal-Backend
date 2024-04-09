@@ -3,6 +3,8 @@ const express = require("express");
 const authController = require('./../controllers/authcontroller');
 const advisorController = require('./../controllers/advisorController');
 
+const notification = require("./../utils/notification");
+
 const router = express.Router();
 
 router.post('/register-advisor', authController.protect, authController.restrictTo('advisor'), advisorController.register);
@@ -20,5 +22,6 @@ router.get('/get-all-stocks', authController.protect, authController.restrictTo(
 router.patch('/edit-stocks/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.editPlan);
 router.get('/get-plan-details/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.getPlan);
 router.get('/get-all-notifications', authController.protect, authController.restrictTo('advisor'), advisorController.getAllNotification);
+router.get('/view-notification', authController.protect, authController.restrictTo('client', 'advisor'), notification.viewNotification);
 
 module.exports = router;

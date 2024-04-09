@@ -5,6 +5,10 @@ const router = express.Router();
 const authController = require("./../controllers/authcontroller");
 const clientController = require("../controllers/clientController");
 
+const stocks = require('./../utils/nse-stocks-data');
+
+router.get('/getStocks', authController.protect, authController.restrictTo('client'), stocks.getStocksSymbols);
+router.get('/getEquityHistoricalData', authController.protect, authController.restrictTo('client'), stocks.getEquityHistoricalData);
 router.post('/register-client', authController.protect, authController.restrictTo('client'), clientController.register)
 router.get('/get-all-advisors', authController.protect, authController.restrictTo('client'), clientController.listOfAllAdvisors);
 router.get('/list-of-plans/:advisorId', authController.protect, authController.restrictTo('client'), clientController.listOfPlans)
