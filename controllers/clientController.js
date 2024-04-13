@@ -65,21 +65,40 @@ exports.listOfAllAdvisors = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.listOfPlans = asyncErrorHandler(async (req, res, next) => {
-
     const advisorId = req.params.advisorId;
-
     const client = await Client.findOne({ userIdCredentials: req.user._id });
+    const currentDate = new Date();
 
-    const plans = await Plan.find({ 
-        advisorId,
-        _id: { $nin: client.planIds } 
+    const plans = await Plan.find({ advisorId });
+    // Create a new array of plans with the isSubscribed property included
+    const plansWithSubscribedStatus = plans.map(async (plan) => {
+        let isSubscribed = false;
+        // Check if the plan is premium and if the client is subscribed
+        if (plan.isPremium && plan.subscribedClientIds.length > 0) {
+            const subscribedClient = plan.subscribedClientIds.find(clientData => clientData.clientId === client._id.toString());
+            if (subscribedClient) {
+                // Check if the subscription has not expired
+                if (subscribedClient.subscriptionExpires > currentDate) {
+                    isSubscribed = true;
+                } else {
+                    // If subscription has expired, remove the client from subscribedClientIds array
+                    plan.subscribedClientIds = plan.subscribedClientIds.filter(clientData => clientData.clientId !== client._id.toString());
+                    await plan.save(); // Save the plan to persist changes
+                }
+            }
+        }
+        return { ...plan.toObject(), isSubscribed }; // Include isSubscribed in the plan object
     });
-        
+
+    const resolvedPlans = await Promise.all(plansWithSubscribedStatus); // Wait for all plans to be resolved
+
     res.status(200).json({
         status: 'success',
-        plans
+        plans: resolvedPlans
     });
-})
+});
+;
+
 
 exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
     const planId = req.params.planId;
@@ -207,23 +226,65 @@ exports.listOfAdvisors = asyncErrorHandler(async (req, res, next) => {
 })
 
 exports.listOfSubscribedPlans = asyncErrorHandler(async (req, res, next) => {
+    // const client = await Client.findOne({ userIdCredentials: req.user._id });
+
+    // const transactions = await Transaction.find({ clientId: client._id });
+
+    // const AdvisorIds = transactions.map(transaction => {
+    //     return transaction.advisorId
+    // });
+
+    // const advisorNames = await Promise.all(AdvisorIds.map(async (id) => {
+    //     const advisor = await Advisor.findById(id).  select('name');
+    //     return advisor.name; // Return the name of the advisor
+    // }));
+
+    // res.status(200).json({
+    //     status: 'success',
+    //     transactions,
+    //     advisorNames
+    // });
+
     const client = await Client.findOne({ userIdCredentials: req.user._id });
+    const currentDate = new Date();
 
-    const transactions = await Transaction.find({ clientId: client._id });
+    // Get the list of subscribed planIds for the current client
+    const subscribedPlanIds = client.subscribedPlanIds.map(subscribedPlan => subscribedPlan.planId);
 
-    const AdvisorIds = transactions.map(transaction => {
-        return transaction.advisorId
+    // Find all plans that the client is subscribed to
+    const plans = await Plan.find({ _id: { $in: subscribedPlanIds } }).select('-photo');
+
+    // Array to store plans that need to be saved
+    const plansToUpdate = [];
+
+    // Remove expired subscriptions
+    plans.forEach(plan => {
+        plan.subscribedClientIds = plan.subscribedClientIds.filter(subscribedClient => {
+            // Check if the subscription has expired
+            if (subscribedClient.subscriptionExpires <= currentDate) {
+                return false; // Remove client from the subscribedClientIds array
+            }
+            return true; // Keep client in the subscribedClientIds array
+        });
+
+        // If there are no clients subscribed to this plan anymore, remove the plan from the client's subscribedPlanIds array
+        if (plan.subscribedClientIds.length === 0) {
+            client.subscribedPlanIds = client.subscribedPlanIds.filter(subscribedPlan => subscribedPlan.planId !== plan._id.toString());
+        }
+
+        // Add the plan to plansToUpdate array for later saving
+        plansToUpdate.push(plan);
     });
 
-    const advisorNames = await Promise.all(AdvisorIds.map(async (id) => {
-        const advisor = await Advisor.findById(id).select('name');
-        return advisor.name; // Return the name of the advisor
-    }));
+    // Save all plans that need to be updated
+    await Promise.all(plansToUpdate.map(plan => plan.save()));
+
+    // Save the client with updated subscribedPlanIds
+    await client.save();
 
     res.status(200).json({
         status: 'success',
-        transactions,
-        advisorNames
+        plans
     });
 })
 
@@ -272,10 +333,34 @@ exports.listOfSubscribedPlansDetails = asyncErrorHandler( async(req, res, next) 
 exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
     const plans = await Plan.find();
 
+    const client = await Client.findOne({ userIdCredentials: req.user._id });
+    const currentDate = new Date();
+    // Create a new array of plans with the isSubscribed property included
+    const plansWithSubscribedStatus = plans.map(async (plan) => {
+        let isSubscribed = false;
+        // Check if the plan is premium and if the client is subscribed
+        if (plan.isPremium && plan.subscribedClientIds.length > 0) {
+            const subscribedClient = plan.subscribedClientIds.find(clientData => clientData.clientId === client._id.toString());
+            if (subscribedClient) {
+                // Check if the subscription has not expired
+                if (subscribedClient.subscriptionExpires > currentDate) {
+                    isSubscribed = true;
+                } else {
+                    // If subscription has expired, remove the client from subscribedClientIds array
+                    plan.subscribedClientIds = plan.subscribedClientIds.filter(clientData => clientData.clientId !== client._id.toString());
+                    await plan.save(); // Save the plan to persist changes
+                }
+            }
+        }
+        return { ...plan.toObject(), isSubscribed }; // Include isSubscribed in the plan object
+    });
+
+    const resolvedPlans = await Promise.all(plansWithSubscribedStatus); // Wait for all plans to be resolved
+
     res.status(200).json({
         status: 'success',
-        plans
-    })
+        plans: resolvedPlans
+    });
 });
 
 exports.getAdvisor = asyncErrorHandler(async (req, res, next) => {
