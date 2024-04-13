@@ -211,6 +211,16 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+exports.investedPlans = asyncErrorHandler(async (req, res, next) => {
+    const client = await Client.findOne({ userIdCredentials: req.user._id });
+
+    const plans = await Plan.find({ _id: { $in: client.boughtPlanIds } });
+
+    res.status(200).json({
+        status: "success",
+        plans
+    });
+})
 
 exports.listOfAdvisors = asyncErrorHandler(async (req, res, next) => {
     const client = await Client.findOne({ userIdCredentials: req.user._id });

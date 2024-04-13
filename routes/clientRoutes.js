@@ -20,5 +20,6 @@ router.get('/getAdvisor/:advisorId', authController.protect, authController.rest
 router.get('/get-own-details', authController.protect, authController.restrictTo('client'), clientController.getOwnDetails);
 router.patch('/edit-profile',authController.protect, authController.restrictTo('client'), clientController.editProfile);
 router.get('/get-all-notifications', authController.protect, authController.restrictTo('client'), clientController.getAllNotification);
+router.get('/get-all-investedPlans', authController.protect, authController.restrictTo('client'), clientController.investedPlans);
 
 module.exports = router;
