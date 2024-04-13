@@ -292,9 +292,9 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     if(!registeredUser){
         res.cookie('name',user.name);
         res.cookie('email',user.email);
-        res.redirect("http://localhost:3000/clform");
+        res.redirect("http://localhost:3000/client_registration_form");
     } else {
-        res.redirect("http://localhost:3000/cldash")
+        res.redirect("http://localhost:3000/client_dashboard")
     }
    
 })

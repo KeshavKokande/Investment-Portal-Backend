@@ -81,73 +81,117 @@ exports.listOfPlans = asyncErrorHandler(async (req, res, next) => {
     });
 })
 
-exports.buyAPlan = asyncErrorHandler( async(req, res, next) => {
-
+exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
     const planId = req.params.planId;
     const advisorId = req.params.advisorId;
-  
+
     const plan = await Plan.findById(planId);
     const client = await Client.findOne({ userIdCredentials: req.user._id });
     const advisor = await Advisor.findById(advisorId);
 
-    if(!client){
-        return next(new AppError('U need to first register urself to make profile!!!', 404));
+    // Check if the client exists
+    if (!client) {
+        return next(new AppError('You need to first register yourself to make a profile!!!', 404));
     }
 
-    if(client.planIds.includes(plan._id)){
-        return next(new AppError('This plan u already buied u moron!!! (⩺_⩹)', 400));
+    // Check if the plan is premium
+    if (!plan.isPremium) {
+        return next(new AppError('This plan is not a premium plan!', 400));
     }
 
-    // const planStatsObj = plan.stocks.map(stock => ({
-    //     stockName: stock.stockName,
-    //     contriAmount: (stock.contri / 100) * req.body.investedAmount
-    // }));
+    // Update subscribedPlanIds for the client
+    if (!client.subscribedPlanIds) {
+        client.subscribedPlanIds = [];
+    }
 
+    const subscriptionExpires = new Date();
+    subscriptionExpires.setDate(subscriptionExpires.getDate() + 84); // Assuming 84 days subscription
+
+    client.subscribedPlanIds.push({
+        planId: plan._id,
+        subscriptionDate: new Date(),
+        subscriptionExpires: subscriptionExpires,
+    });
+
+    await client.save();
+
+    // Update subscribedClientIds for the plan
+    if (!plan.subscribedClientIds) {
+        plan.subscribedClientIds = [];
+    }
+
+    plan.subscribedClientIds.push({
+        clientId: client._id,
+        subscriptionDate: new Date(),
+        subscriptionExpires: subscriptionExpires,
+    });
+
+    await plan.save();
+
+    notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
+    
+    res.status(201).json({
+        status: 'success',
+        message: `${client.name} bought a premium plan`,
+    });
+});
+
+exports.investPlan = asyncErrorHandler(async (req, res, next) => {
+    const planId = req.params.planId;
+    const advisorId = req.params.advisorId;
+
+    const plan = await Plan.findById(planId);
+    const client = await Client.findOne({ userIdCredentials: req.user._id });
+    const advisor = await Advisor.findById(advisorId);
+
+    // Check if the client exists
+    if (!client) {
+        return next(new AppError('You need to first register yourself to make a profile!!!', 404));
+    }
+
+    // Update boughtPlanIds for the client
+    if (!client.boughtPlanIds.includes(planId)) {
+        client.boughtPlanIds.push(planId);
+    }
+
+    // Update boughtClientIds for the plan
+    if (!plan.boughtClientIds.includes(client._id)) {
+        plan.boughtClientIds.push(client._id);
+    }
+
+    await Promise.all([client.save(), plan.save()]);
+
+    // Update clientIds for the advisor
+    if (!advisor.clientIds.includes(client._id)) {
+        advisor.clientIds.push(client._id);
+        await advisor.save();
+    }
+
+    // Update advisorIds for the client
+    if (!client.advisorIds.includes(advisor._id)) {
+        client.advisorIds.push(advisor._id);
+        await client.save();
+    }
+
+    // creating a transaction
     const transaction = await Transaction.create({
         planId,
         planName: plan.planName,
         advisorId,
         clientId : client._id,
         clientName: client.name,
-        investedAmount: req.body.investedAmount,
-        // planStats: planStatsObj
+        investedAmount: req.body.investedAmount
     });
 
-    if(!advisor.clientIds){
-        advisor.clientIds = [];
-        advisor.clientIds.push(client._id.toString());
-        await advisor.save()
-    } else {
-        if (!advisor.clientIds.includes(client._id.toString())) {
-            advisor.clientIds.push(client._id.toString());
-            await advisor.save();
-        }
-    }
-
-    if(!client.advisorIds){
-        client.advisorIds = [];
-        client.planIds = [];
-        client.advisorIds.push(advisor._id.toString());
-        client.planIds.push(plan._id.toString());
-        await client.save();
-    } else {
-        if (!client.advisorIds.includes(advisor._id.toString())){
-            client.advisorIds.push(advisor._id.toString());
-        }
-        if(!client.planIds.includes(plan._id.toString())){
-            client.planIds.push(plan._id.toString());
-        }
-        await client.save();
-    }
-
-    plan.noOfSubscription += 1;
-    await plan.save();
     notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
+    
     res.status(201).json({
         status: 'success',
+        message: `${client.name} bought a plan`,
         transaction
     });
-})
+});
+
 
 exports.listOfAdvisors = asyncErrorHandler(async (req, res, next) => {
     const client = await Client.findOne({ userIdCredentials: req.user._id });

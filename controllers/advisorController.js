@@ -154,7 +154,14 @@ exports.listOfClients = asyncErrorHandler(async(req, res, next) => {
 });
 
 exports.getOwndetails = asyncErrorHandler(async (req, res, next) => {
-    const advisor = await Advisor.findOne({userIdCredentials: req.user._id});
+    const advisor = await Advisor.findOne({userIdCredentials: req.user._id}).select('name');
+
+    if (!advisor) {
+        return res.status(404).json({
+            status: "failed",
+            message: "Advisor not found"
+        });
+    }
 
     res.status(200).json({
         status: 'success',
@@ -321,4 +328,4 @@ exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
         status: 'success',
         notifications
     });
-})
+});

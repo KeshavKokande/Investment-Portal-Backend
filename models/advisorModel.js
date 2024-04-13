@@ -15,7 +15,8 @@ const advisorSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Email is required for advisor']
+        required: [true, 'Email is required for advisor'],
+        unique: true
     },
     userIdCredentials: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,7 +24,11 @@ const advisorSchema = new mongoose.Schema({
     },
     clientIds: {
         type: [String]
-    }
+    },
+    name: {
+        type: String,
+        enum: ['standard', 'premium', 'executive']
+    },
 }, {
     collection: "advisors",
     versionKey: false,

@@ -6,8 +6,9 @@ const authController = require("./../controllers/authcontroller");
 
 const stocks = require('./../utils/nse-stocks-data');
 
-router.get('/getStocks', authController.protect, authController.restrictTo('client'), stocks.getStocksSymbols);
-router.get('/getEquityHistoricalData', authController.protect, authController.restrictTo('client'), stocks.getEquityHistoricalData);
-router.post('/daysandgraph', authController.protect, authController.restrictTo('client'), stocks.getGraphData);
+router.get('/getEquityHistoricalData', stocks.getEquityHistoricalData);
+router.post('/daysandgraph', stocks.getGraphData);
+router.get('/getEquityStockIndices', stocks.getEquityStockIndices);
+router.post('/calculatePlanData', stocks.calculatePlanData);
 
 module.exports = router;

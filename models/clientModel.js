@@ -7,14 +7,15 @@ const clientSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Email is required for advisor']
+        required: [true, 'Email is required for advisor'],
+        unique: true
     },
     userIdCredentials: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
     age: {
-        type: String,
+        type: Number,
         default: ""
     },
     phone: {
@@ -61,7 +62,7 @@ const clientSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    planIds: {
+    boughtPlanIds: {
         type: [String]
     },
     subscribedPlanIds: {

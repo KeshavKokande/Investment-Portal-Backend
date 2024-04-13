@@ -54,21 +54,24 @@ const plansSchema = new mongoose.Schema({
         data: Buffer, // Store image data as buffer
         contentType: String // Store image content type
     },
-    planFees: {
-        type: Number,
-        default: 0
+    isPremium : {
+        type: Boolean,
+        required: [true, 'Plan need to be categorize as Free or Premium!!!']
     },
     subscribedClientIds: {
-        type: [String],
+        type: [{
+            clientId: String,
+            subscriptionDate: Date,
+            subscriptionExpires: Date,
+        }],
         default: [],
         required: function() {
             return this.isPremium === true;
         }
     },
-    // CAGR: {
-    //     type: [Number],
-    //     default: [0, 0, 0, 0, 0]
-    // },
+    boughtClientIds: {
+        type: [String]
+    },
     cash:{
         type: Number, 
         default: 0
