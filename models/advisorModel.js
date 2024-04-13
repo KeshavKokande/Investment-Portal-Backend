@@ -25,7 +25,7 @@ const advisorSchema = new mongoose.Schema({
     clientIds: {
         type: [String]
     },
-    name: {
+    category: {
         type: String,
         enum: ['standard', 'premium', 'executive']
     },
