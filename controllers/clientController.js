@@ -196,6 +196,7 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     const transaction = await Transaction.create({
         planId,
         planName: plan.planName,
+        isPremium: plan.isPremium,
         advisorId,
         clientId : client._id,
         clientName: client.name,
@@ -206,7 +207,7 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     
     res.status(201).json({
         status: 'success',
-        message: `${client.name} bought a plan`,
+        message: `${client.name} bought a plan ${transaction.planName}`,
         transaction
     });
 });
