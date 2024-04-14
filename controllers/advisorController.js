@@ -329,3 +329,49 @@ exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
         notifications
     });
 });
+
+exports.ratioOfPlansSold = asyncErrorHandler(async (req, res, next) => {
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+
+    const transactions = await Transaction.find({ advisorId: advisor._id });
+
+    let countFreePlansSold = 0;
+    let countPremiumPlansSold = 0;
+
+    transactions.map((transaction) => {
+        if(transaction.isPremium === false){
+            countFreePlansSold++;
+        } else {
+            countPremiumPlansSold++
+        }
+    });
+
+    res.status(200).json({
+        status: "success",
+        FreeSoldCount: countFreePlansSold,
+        PremiumSoldCount: countPremiumPlansSold
+    });
+});
+
+exports.ratioOfToatalInvestedAmt = asyncErrorHandler(async (req, res, next) => {
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+
+    const transactions = await Transaction.find({ advisorId: advisor._id });
+
+    let totalInvestedAmtFreePlans = 0;
+    let totalInvestedAmtPremiumPlans = 0;
+
+    transactions.map((transaction) => {
+        if(transaction.isPremium === false){
+            totalInvestedAmtFreePlans += transaction.investedAmount;
+        } else {
+            totalInvestedAmtPremiumPlans += transaction.investedAmount;
+        }
+    });
+
+    res.status(200).json({
+        status: "success",
+        freePlans: totalInvestedAmtFreePlans,
+        premiumPlans: totalInvestedAmtPremiumPlans
+    });
+})

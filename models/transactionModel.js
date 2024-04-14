@@ -10,6 +10,10 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    isPremium: {
+        type: Boolean,
+        required: [true, 'the plan bought is Free or Premium!!!']
+    },
     clientId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Client'
