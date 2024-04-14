@@ -23,10 +23,9 @@ router.patch('/edit-stocks/:planId', authController.protect, authController.rest
 router.get('/get-plan-details/:planId', authController.protect, authController.restrictTo('advisor'), advisorController.getPlan);
 router.get('/get-all-notifications', authController.protect, authController.restrictTo('advisor'), advisorController.getAllNotification);
 router.get('/view-notification/:notificationId', authController.protect, authController.restrictTo('advisor'), notification.viewNotification);
-=======
 router.get('/view-notification', authController.protect, authController.restrictTo('advisor'), notification.viewNotification);
 router.get('/ratio-of-free-Vs-prem-plans-sold', authController.protect, authController.restrictTo('advisor'), advisorController.ratioOfPlansSold);
 router.get('/ratio-of-free-Vs-prem-plans-total-investedAmount', authController.protect, authController.restrictTo('advisor'), advisorController.ratioOfToatalInvestedAmt);
->>>>>>> f9c2c7606b3d68d09c0e2630ed8b6cd7213c2171
+
 
 module.exports = router;
