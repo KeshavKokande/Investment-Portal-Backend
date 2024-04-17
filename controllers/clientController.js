@@ -124,7 +124,7 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
     }
 
     const subscriptionExpires = new Date();
-    subscriptionExpires.setDate(subscriptionExpires.getDate() + 84); // Assuming 84 days subscription
+    subscriptionExpires.setDate(subscriptionExpires.getDate() + req.body.planDays); // Assuming  days subscription
 
     client.subscribedPlanIds.push({
         planId: plan._id,

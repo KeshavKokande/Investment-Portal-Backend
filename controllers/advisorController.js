@@ -8,61 +8,14 @@ const Stock = require('./../models/stocksModel');
 const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
+const { triggerMultipleNotification } = require("../utils/notification");
 
 // Edit
 // 1. Existing Stock qty === 0, it should be deleted
 // 2. Existing Stock qty decreased than previous
 // 3. Existing Stock qty increased than previous
 
-function calculateNewAvgPrice(stocks, updatedStocks) {
-    const newStocks = [];
-    const processedSymbols = {};
-    
-    for (const updatedStock of updatedStocks) {
-        const { symbol, qty, price: avgPrice } = updatedStock;
-        
-        if (processedSymbols[symbol]) {
-            continue;
-        }
-        
-        processedSymbols[symbol] = true;
-        
-        let foundStock = false;
-        for (const stock of stocks) {
-            if (stock.symbol === symbol) {
-                foundStock = true;
-                const { qty: oldQty, price: oldAvgPrice } = stock;
-                
-                if (qty > oldQty) {
-                    const newQty = qty;
-                    const newAvgPrice = ((oldQty * oldAvgPrice) + ((qty - oldQty) * avgPrice)) / newQty;
-                    
-                    newStocks.push({
-                        symbol,
-                        qty: newQty,
-                        price: newAvgPrice
-                    });
-                } else {
-                    newStocks.push({
-                        symbol,
-                        qty,
-                        price: oldAvgPrice
-                    });
-                }
-            }
-        }
-        
-        if (!foundStock) {
-            newStocks.push({
-                symbol,
-                qty,
-                price: avgPrice
-            });
-        }
-    }
-    
-    return newStocks;
-}
+
 
 exports.register = asyncErrorHandler(async (req, res, next) => {
 
@@ -294,21 +247,90 @@ exports.getAllStocks = asyncErrorHandler(async (req, res, next) => {
     })
 })
 
-exports.editPlan = asyncErrorHandler(async (req, res, next) => {
+function calculateNewAvgPrice(stocks, updatedStocks) {
+    const newStocks = [];
+    const processedSymbols = {};
+    
+    for (const updatedStock of updatedStocks) {
+        const { symbol, qty, price: avgPrice } = updatedStock;
+        
+        if (processedSymbols[symbol]) {
+            continue;
+        }
+        
+        processedSymbols[symbol] = true;
+        
+        let foundStock = false;
+        for (const stock of stocks) {
+            if (stock.symbol === symbol) {
+                foundStock = true;
+                const { qty: oldQty, price: oldAvgPrice } = stock;
+                
+                if (qty > oldQty) {
+                    const newQty = qty;
+                    const newAvgPrice = ((oldQty * oldAvgPrice) + ((qty - oldQty) * avgPrice)) / newQty;
+                    
+                    newStocks.push({
+                        symbol,
+                        qty: newQty,
+                        price: newAvgPrice
+                    });
+                } else {
+                    newStocks.push({
+                        symbol,
+                        qty,
+                        price: oldAvgPrice
+                    });
+                }
+            }
+        }
+        
+        if (!foundStock) {
+            newStocks.push({
+                symbol,
+                qty,
+                price: avgPrice
+            });
+        }
+    }
 
-    const planObj = {...req.body};
+    return newStocks;
+}
+
+exports.editPlan = asyncErrorHandler(async (req, res, next) => {
+    const planObj = { ...req.body };
     const planId = req.params.planId;
 
-    const  plan = await Plan.findById(planId);
+    const plan = await Plan.findById(planId);
     planObj.stocks = calculateNewAvgPrice(plan.stocks, planObj.stocks);
 
     const updatedPlan = await Plan.findByIdAndUpdate(planId, planObj, { new: true });
+
+    if (plan.isPremium === true) {
+        const currentDate = new Date();
+        const activeClientIds = plan.subscribedClientIds
+            .filter(obj => obj.subscriptionExpires > currentDate)
+            .map(obj => obj.clientId);
+
+        // Trigger notification to all clients who have an active subscription
+        await triggerMultipleNotification("Hey Pro users!!! Some changes had been made ﮩ٨ـﮩﮩ٨ـ♡ﮩ٨ـﮩ", senderId, activeClientIds);
+    } else {
+        // Exclude client IDs from boughtClientIds that are already in activeClientIds
+        // const boughtClientIds = plan.boughtClientIds.filter(clientId => {
+        //     return !plan.subscribedClientIds.some(subscribedClient => subscribedClient.clientId === clientId);
+        // });
+
+        // Trigger notification to clients who have invested in the plan but are not subscribed
+        await triggerMultipleNotification("Hey free loaders, somethings cookin (ꈍᴗꈍ) !!!", senderId, plan.boughtClientIds);
+    }
 
     res.status(200).json({
         status: 'success',
         updatedPlan
     });
-})
+});
+
+
 
 exports.getPlan = asyncErrorHandler(async (req, res, next) => {
     const planId = req.params.planId;
