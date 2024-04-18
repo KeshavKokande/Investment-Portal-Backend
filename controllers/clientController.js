@@ -407,7 +407,8 @@ exports.editProfile = asyncErrorHandler(async (req, res, next) => {
 })
 
 exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
-    const notifications = await Notification.find({ recipient: req.user._id });
+    const client = await Client.findOne({userIdCredentials:req.user._id})
+    const notifications = await Notification.find({ recipient: client._id });
 
     res.status(200).json({
         status: 'success',
