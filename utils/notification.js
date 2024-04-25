@@ -10,9 +10,9 @@ exports.triggerNotification = async (message, senderId, recipientId) => {
             recipient: recipientId
         })
         await notification.save();
-        console.log("Notification triggered successfully!!!");
+        console.log(`Notification triggered successfully: ${message}`);
     } catch (err) {
-        console.error("Error triggering notifications:", err);
+        console.error("Error triggering notifications: ", err);
         next(err);
     }
 }
@@ -27,7 +27,7 @@ exports.triggerMultipleNotification = async (message, senderId, recipientIds) =>
             });
             await notification.save();
         }
-        console.log("Notifications triggered successfully!!!");
+        console.log(`Notifications triggered successfully: ${message}`);
     } catch (err) {
         console.error("Error triggering notifications:", err);
         next(err);

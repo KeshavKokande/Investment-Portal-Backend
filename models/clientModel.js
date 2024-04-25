@@ -72,6 +72,14 @@ const clientSchema = new mongoose.Schema({
             subscriptionExpires: Date,
         }]
     },
+    planData: {
+        type: [{
+            planId: String,
+            planName: String,
+            avgPrice: Number,
+            qty: Number
+        }]
+    },
     advisorIds: {
         type: [String]
     },
