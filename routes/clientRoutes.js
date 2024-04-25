@@ -4,6 +4,7 @@ const router = express.Router();
 
 const authController = require("./../controllers/authcontroller");
 const clientController = require("../controllers/clientController");
+const notification = require("./../utils/notification");
 
 const stocks = require('./../utils/nse-stocks-data');
 
@@ -22,5 +23,5 @@ router.patch('/edit-profile',authController.protect, authController.restrictTo('
 router.get('/get-all-notifications', authController.protect, authController.restrictTo('client'), clientController.getAllNotification);
 router.get('/get-all-investedPlans', authController.protect, authController.restrictTo('client'), clientController.investedPlans);
 router.get('/get-transactions', authController.protect, authController.restrictTo('client'), clientController.allTransactions);
-
+router.get('/view-notification/:notificationId', authController.protect, authController.restrictTo('client'), notification.viewNotification);
 module.exports = router;
