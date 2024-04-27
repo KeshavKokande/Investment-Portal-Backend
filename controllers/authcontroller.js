@@ -12,6 +12,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const User = require('./../models/userModel');
 const Client = require('./../models/clientModel');
+const OTP = require('./../models/otpModel');
+
 const { appendFile } = require('fs');
 
 dotenv.config({ path: './config.env' });
@@ -50,7 +52,35 @@ const createSendToken = (user, statusCode, res) => {
 }
 
 exports.signup = asyncErrorHandler(async (req, res, next) => {
-    const newUser = await User.create(req.body);
+    // const newUser = await User.create(req.body);
+    const { name, email, password, passwordConfirm, otp } = req.body;
+    // Check if all details are provided
+    if (!name || !email || !password || !otp) {
+        return next(new AppError(`All the credentials are necessary!!!`, 401));
+    }
+
+    const newUser = await User.create({
+        name,
+        email,
+        password,
+        passwordConfirm,
+        otp
+    });
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(new AppError('User already exists', 403));
+    }
+
+    // Find the most recent OTP for the email
+    const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
+    if (response.length === 0 || otp !== response[0].otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'The OTP is not valid',
+      });
+    }
 
     createSendToken(newUser, 201, res);
 })

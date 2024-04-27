@@ -12,6 +12,7 @@ const stocksDataUpload = require("./populateStocks/stocksData");
 const checkAuthRouter = require('./routes/checkAuthRoutes');
 const advisorRouter = require("./routes/advisorRoutes");
 const clientRouter = require("./routes/clientRoutes");
+const otpRouter = require("./routes/otpRoutes");
 const stockRouter = require("./routes/stockRoutes");
 
 const AppError = require("./utils/appError");
@@ -43,6 +44,7 @@ app.use('/stocksUpload', stocksDataUpload.fillStocks);
 app.use('/api/v1/check-auth', checkAuthRouter);
 app.use('/api/v1/advisor', advisorRouter);
 app.use('/api/v1/client', clientRouter);
+app.use('/api/v1/otp', otpRouter);
 app.use('/api/v1/stock', stockRouter);
 
 app.all('*', (req, res, next) => {

@@ -1,20 +1,19 @@
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 
 // const sendEmail = async (options) => {
-//     // 1. Create a transporter
-//     const transporter = nodemailer.createTransport ({
+//     const transporter = nodemailer.createTransport({
 //         host: process.env.EMAIL_HOST,
 //         port: process.env.EMAIL_PORT,
+//         secure: false, // Use `true` for port 465, `false` for all other ports
 //         auth: {
 //             user: process.env.EMAIL_USERNAME,
 //             pass: process.env.EMAIL_PASSWORD
-//         }
-//         // Activate in gmail "less secure app" option
-//     })
+//         },
+//     });
 
 //     // 2. Define the email options
 //     const mailOptions = {
-//         from: 'Shubham Goswami <shubhambtps588@gmail.com>',
+//         from: 'info@mailtrap.club <mailtrap@sdmds.com>',
 //         to: options.email,
 //         subject: options.subject,
 //         text: options.message,
@@ -23,32 +22,36 @@ const nodemailer = require("nodemailer");
 
 //     // 3. Actually send the email
 //     await transporter.sendMail(mailOptions)
+
+//     console.log("Message sent: %s", info.messageId);
 // }
 
-const sendEmail = async (options) => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: false, // Use `true` for port 465, `false` for all other ports
-        auth: {
-            user: process.env.EMAIL_USERNAME,
-            pass: process.env.EMAIL_PASSWORD
-        },
+// module.exports = sendEmail;
+
+const nodemailer = require('nodemailer');
+
+const mailSender = async (email, title, body) => {
+  try {
+    // Create a Transporter to send emails
+    let transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      }
     });
+    // Send emails to users
+    let info = await transporter.sendMail({
+      from: 'shubhambtps588@gmail.com - Shubham Goswami',
+      to: email,
+      subject: title,
+      html: body,
+    });
+    console.log("Email info: ", info);
+    return info;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-    // 2. Define the email options
-    const mailOptions = {
-        from: 'info@mailtrap.club <mailtrap@sdmds.com>',
-        to: options.email,
-        subject: options.subject,
-        text: options.message,
-        // html: 
-    }
-
-    // 3. Actually send the email
-    await transporter.sendMail(mailOptions)
-
-    console.log("Message sent: %s", info.messageId);
-}
-
-module.exports = sendEmail;
+module.exports = mailSender;
