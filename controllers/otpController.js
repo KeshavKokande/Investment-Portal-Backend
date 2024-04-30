@@ -19,9 +19,9 @@ exports.sendOTP = asyncErrorHandler(async (req, res) => {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
-    });
+    });   
 
-    let result = await OTP.findOne({ otp: otp });
+    let result = await OTP.findOne({ otp });
 
     while (result) {
       otp = otpGenerator.generate(6, {

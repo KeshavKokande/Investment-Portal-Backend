@@ -42,7 +42,7 @@ const mailSender = async (email, title, body) => {
     });
     // Send emails to users
     let info = await transporter.sendMail({
-      from: 'shubhambtps588@gmail.com - Shubham Goswami',
+      from: 'investincedo@gmail.com inVest Inc',
       to: email,
       subject: title,
       html: body,

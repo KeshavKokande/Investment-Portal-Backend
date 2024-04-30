@@ -59,14 +59,6 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
         return next(new AppError(`All the credentials are necessary!!!`, 401));
     }
 
-    const newUser = await User.create({
-        name,
-        email,
-        password,
-        passwordConfirm,
-        otp
-    });
-
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -76,12 +68,16 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
     // Find the most recent OTP for the email
     const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
     if (response.length === 0 || otp !== response[0].otp) {
-      return res.status(400).json({
-        success: false,
-        message: 'The OTP is not valid',
-      });
+      return next(new AppError('OTP is not valid!!!', 400));
     }
 
+    const newUser = await User.create({
+        name,
+        email,
+        password,
+        confirmPassword: passwordConfirm
+    });
+    
     createSendToken(newUser, 201, res);
 })
 
