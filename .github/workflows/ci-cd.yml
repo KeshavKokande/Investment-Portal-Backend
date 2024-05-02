@@ -24,7 +24,7 @@ jobs:
       run: echo "CI=false" >> $GITHUB_ENV    
     - name: npm install, build, and test
       run: |
-        --npm install   
+        # npm install   
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
