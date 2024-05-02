@@ -29,7 +29,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(cors({
-  origin: 'https://invest-public.azurewebsites.net',
+  origin: 'https://invest-public.azurewebsites.net/',
   credentials: true
 }));
 
