@@ -26,6 +26,7 @@ jobs:
       run: |        
          npm install   
          ls -a
+         rm -rf node_modules
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
