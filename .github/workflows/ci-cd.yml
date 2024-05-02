@@ -23,8 +23,9 @@ jobs:
     - name: Set CI environment variable
       run: echo "CI=false" >> $GITHUB_ENV    
     - name: npm install, build, and test
-      run: |
-        # npm install   
+      run: |        
+         npm install   
+         ls -a
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
@@ -37,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Development'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
