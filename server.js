@@ -13,6 +13,6 @@ mongoose
   .connect(DB)
   .then(() => console.log('DB connection successful!'));
 
-app.listen(8000, () => {
-    console.log("Listening to port 8000");
+app.listen(8080, () => {
+    console.log("Listening to port 8080");
 })
