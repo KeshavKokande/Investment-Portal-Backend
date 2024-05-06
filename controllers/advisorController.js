@@ -9,6 +9,7 @@ const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const { triggerMultipleNotification } = require("../utils/notification");
+const getPlanDescrpGenAI = require("../utils/getPlanDescrpGenAI");
 
 // Edit
 // 1. Existing Stock qty === 0, it should be deleted
@@ -35,12 +36,15 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.addPlan = asyncErrorHandler(async (req, res, next) => {
+
     const planObj = {...req.body};
     const advisorId = await Advisor.findOne({userIdCredentials: req.user._id});
     planObj.advisorId = advisorId._id;
     planObj.stocks
 
-    console.log(planObj);
+    console.log("plan's advise : ", planObj.advise);
+    planObj.advise = await getPlanDescrpGenAI(planObj.stocks);
+    console.log("Updated Advise of the plan: ", planObj.advise)
     planObj.photo = {
         data: new Buffer.from(req.body.photo.data, 'base64'),
         contentType: req.body.photo.contentType

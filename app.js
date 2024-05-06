@@ -28,8 +28,23 @@ if (process.env.NODE_ENV === 'development') {
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
+function getCurrentGitBranch() {
+  const { execSync } = require('child_process');
+  try {
+      return execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+  } catch (error) {
+      console.error('Error getting Git branch:', error);
+      return null;
+  }
+}
+
+// Check if the current Git branch is 'main'
+const currentBranch = getCurrentGitBranch();
+const corsOrigin = currentBranch === 'main' ? 'https://invest-public.azurewebsites.net' : 'http://localhost:3000';
+
+// Set up CORS middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -40,6 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(cookieParser());
+
 app.use('/stocksUpload', stocksDataUpload.fillStocks);
 app.use('/api/v1/check-auth', checkAuthRouter);
 app.use('/api/v1/advisor', advisorRouter);
