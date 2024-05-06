@@ -118,19 +118,46 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
         return next(new AppError('This plan is not a premium plan!', 400));
     }
 
+    // Check if the client is already subscribed to this plan
+    const existingClientSubscription = client.subscribedPlanIds.find(subscription => subscription.planId === plan._id);
+    if (existingClientSubscription && existingClientSubscription.subscriptionExpires > new Date()) {
+        // Client is already subscribed to this plan and subscription is not expired
+        return res.status(200).json({
+            status: 'success',
+            message: `${client.name} is already subscribed to this plan.`,
+        });
+    }
+
+    // Check if the plan is already subscribed by this client
+    const existingPlanSubscription = plan.subscribedClientIds.find(subscription => subscription.clientId === client._id);
+    if (existingPlanSubscription && existingPlanSubscription.subscriptionExpires > new Date()) {
+        // Plan is already subscribed by this client and subscription is not expired
+        return res.status(200).json({
+            status: 'success',
+            message: `This plan is already subscribed by ${client.name}.`,
+        });
+    }
+
     // Update subscribedPlanIds for the client
     if (!client.subscribedPlanIds) {
         client.subscribedPlanIds = [];
     }
 
     const subscriptionExpires = new Date();
-    subscriptionExpires.setDate(subscriptionExpires.getDate() + req.body.planDays); // Assuming  days subscription
+    subscriptionExpires.setDate(subscriptionExpires.getDate() + req.body.planDays); // Assuming days subscription
 
-    client.subscribedPlanIds.push({
-        planId: plan._id,
-        subscriptionDate: new Date(),
-        subscriptionExpires: subscriptionExpires,
-    });
+    if (existingClientSubscription) {
+        // If subscription exists but expired, update subscription date and expiration
+        existingClientSubscription.subscriptionDate = new Date();
+        existingClientSubscription.subscriptionExpires = subscriptionExpires;
+    } else {
+        // If subscription doesn't exist, push a new subscription
+        client.subscribedPlanIds.push({
+            planId: plan._id,
+            subscriptionDate: new Date(),
+            subscriptionExpires: subscriptionExpires,
+        });
+    }
 
     await client.save();
 
@@ -139,11 +166,18 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
         plan.subscribedClientIds = [];
     }
 
-    plan.subscribedClientIds.push({
-        clientId: client._id,
-        subscriptionDate: new Date(),
-        subscriptionExpires: subscriptionExpires,
-    });
+    if (existingPlanSubscription) {
+        // If subscription exists but expired, update subscription date and expiration
+        existingPlanSubscription.subscriptionDate = new Date();
+        existingPlanSubscription.subscriptionExpires = subscriptionExpires;
+    } else {
+        // If subscription doesn't exist, push a new subscription
+        plan.subscribedClientIds.push({
+            clientId: client._id,
+            subscriptionDate: new Date(),
+            subscriptionExpires: subscriptionExpires,
+        });
+    }
 
     await plan.save();
 
@@ -154,6 +188,7 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
         message: `${client.name} bought a premium plan`,
     });
 });
+
 
 exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     const planId = req.params.planId;
@@ -192,6 +227,8 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
         await client.save();
     }
 
+    const investedAmt = req.body.price * req.body.qty;
+
     // creating a transaction
     const transaction = await Transaction.create({
         planId,
@@ -200,8 +237,34 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
         advisorId,
         clientId : client._id,
         clientName: client.name,
-        investedAmount: req.body.investedAmount
+        investedAmount: investedAmt
     });
+
+    // Find the index of the plan in client.planData array
+    const planIndex = client.planData.findIndex(data => data.planId === plan.planId);
+
+    if (planIndex !== -1) {
+        // If the plan exists, update its details
+        const existingData = client.planData[planIndex];
+        const newQty = req.body.qty + existingData.qty;
+        const newAvgPrice = ((req.body.price * req.body.qty) + (existingData.avgPrice * existingData.qty)) / newQty;
+
+        // Update planData
+        client.planData[planIndex].qty = newQty;
+        client.planData[planIndex].avgPrice = newAvgPrice;
+    } else {
+        // If the plan doesn't exist, create a new document
+        const newDocument = {
+            planId: plan.planId,
+            planName: plan.planName,
+            avgPrice: req.body.price,
+            qty: req.body.qty
+        };
+
+        // Add the new document to planData
+        client.planData.push(newDocument);
+    }
+
 
     notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
