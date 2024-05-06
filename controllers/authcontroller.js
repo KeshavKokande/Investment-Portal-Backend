@@ -53,7 +53,7 @@ const createSendToken = (user, statusCode, res) => {
 
 exports.signup = asyncErrorHandler(async (req, res, next) => {
     // const newUser = await User.create(req.body);
-    const { name, email, password, passwordConfirm, otp } = req.body;
+    const { name, email, password, confirmPassword, otp } = req.body;
     // Check if all details are provided
     if (!name || !email || !password || !otp) {
         return next(new AppError(`All the credentials are necessary!!!`, 401));
@@ -75,7 +75,7 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
         name,
         email,
         password,
-        confirmPassword: passwordConfirm
+        confirmPassword: confirmPassword
     });
     
     createSendToken(newUser, 201, res);
