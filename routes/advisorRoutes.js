@@ -8,6 +8,7 @@ const notification = require("./../utils/notification");
 const router = express.Router();
 
 router.post('/register-advisor', authController.protect, authController.restrictTo('advisor'), advisorController.register);
+router.post('/getGenAIPlanr', authController.protect, authController.restrictTo('advisor'), advisorController.getGenAIPlan);
 router.post('/add-plans', authController.protect, authController.restrictTo('advisor'), advisorController.addPlan);
 router.get('/get-own-details', authController.protect, authController.restrictTo('advisor'), advisorController.getOwndetails);
 router.get('/list-of-plans', authController.protect, authController.restrictTo('advisor'), advisorController.listOfPlans);

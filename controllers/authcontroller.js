@@ -259,7 +259,7 @@ exports.resetPassword = asyncErrorHandler(async(req, res, next) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/v1/check-auth/auth/google/callback",
+    callbackURL: "/api/v1/check-auth/google/callback",
     passReqToCallback: true
     },
     async function (request, accessToken, refreshToken, profile, done)  {
@@ -318,9 +318,9 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     if(!registeredUser){
         res.cookie('name',user.name);
         res.cookie('email',user.email);
-        res.redirect("http://localhost:3000/client_registration_form");
+        res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
     } else {
-        res.redirect("http://localhost:3000/client_dashboard")
+        res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
     }
    
 })
