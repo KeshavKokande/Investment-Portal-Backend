@@ -40,7 +40,7 @@ function getCurrentGitBranch() {
 
 // Check if the current Git branch is 'main'
 const currentBranch = getCurrentGitBranch();
-const corsOrigin = currentBranch === 'main' ? 'https://invest-public.azurewebsites.net' : 'http://localhost:3000';
+const corsOrigin = 'https://invest-public.azurewebsites.net';
 
 // Set up CORS middleware
 app.use(cors({
