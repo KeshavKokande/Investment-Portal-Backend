@@ -35,6 +35,17 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+exports.getGenAIPlan = asyncErrorHandler(async (req, res, next) => {
+    const stocks = req.body.stocks;
+
+    const planAdvise = await getPlanDescrpGenAI(stocks);
+
+    res.status(200).json({
+        status: "success",
+        planAdvise
+    });
+})
+
 exports.addPlan = asyncErrorHandler(async (req, res, next) => {
 
     const planObj = {...req.body};
@@ -42,9 +53,6 @@ exports.addPlan = asyncErrorHandler(async (req, res, next) => {
     planObj.advisorId = advisorId._id;
     planObj.stocks
 
-    console.log("plan's advise : ", planObj.advise);
-    planObj.advise = await getPlanDescrpGenAI(planObj.stocks);
-    console.log("Updated Advise of the plan: ", planObj.advise)
     planObj.photo = {
         data: new Buffer.from(req.body.photo.data, 'base64'),
         contentType: req.body.photo.contentType
