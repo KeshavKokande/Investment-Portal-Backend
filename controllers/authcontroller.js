@@ -44,11 +44,6 @@ const createSendToken = (user, statusCode, res) => {
         token,
         user
     });
-    // if(user.role === 'client'){
-    //     res.redirect('/api/v1/check-auth/welcome-client');
-    // } else {
-    //     res.redirect('/api/v1/check-auth/welcome-advisor');
-    // }
 }
 
 exports.signup = asyncErrorHandler(async (req, res, next) => {
@@ -259,7 +254,7 @@ exports.resetPassword = asyncErrorHandler(async(req, res, next) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/v1/check-auth/google/callback",
+    callbackURL: "/api/v1/check-auth/auth/google/callback",
     passReqToCallback: true
     },
     async function (request, accessToken, refreshToken, profile, done)  {
