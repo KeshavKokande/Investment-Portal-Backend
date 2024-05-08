@@ -314,15 +314,13 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
         httpOnly: true,
         sameSite: 'None',
         secure: true,
-        domain: 'invest-public.azurewebsites.net'
+        domain: '.azurewebsites.net'
     };
  
     res.cookie('jwt', token, cookieOptions);
     const user = await User.findById(req.user);
     const registeredUser = await Client.findOne({ userIdCredentials: user._id });
     if(!registeredUser){
-        res.cookie('name',user.name);
-        res.cookie('email',user.email);
         res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
     } else {
         res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
