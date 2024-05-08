@@ -29,6 +29,8 @@ const notificationSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Create TTL index
+notificationSchema.index({ timestamp: 1 }, { expireAfterSeconds: 18000 });
 
 const Notification = mongoose.model('Notification', notificationSchema);
 module.exports = Notification;
