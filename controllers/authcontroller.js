@@ -313,7 +313,8 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
         httpOnly: true,
         sameSite: 'None',
-        secure: true
+        secure: true,
+        domain: 'invest-public.azurewebsites.net'
     };
  
     res.cookie('jwt', token, cookieOptions);
