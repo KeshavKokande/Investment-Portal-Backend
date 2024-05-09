@@ -433,10 +433,11 @@ exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
         // Find the advisor for this plan
         const advisor = advisors.find((adv) => adv._id.toString() === plan.advisorId.toString());
         const advisorName = advisor ? advisor.name : 'Unknown';
+        const category = advisor ? advisor.category: 'standard';
         
         
 
-        return { ...plan.toObject(), isSubscribed, advisorName }; // Include isSubscribed and advisorName in the plan object
+        return { ...plan.toObject(), isSubscribed, advisorName, category }; // Include isSubscribed and advisorName in the plan object
     });
 
     const resolvedPlans = await Promise.all(plansWithSubscribedStatus); // Wait for all plans to be resolved
