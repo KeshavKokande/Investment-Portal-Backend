@@ -265,6 +265,7 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
         client.planData.push(newDocument);
     }
 
+    await client.save();
 
     notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
