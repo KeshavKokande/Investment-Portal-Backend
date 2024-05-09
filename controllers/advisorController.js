@@ -325,7 +325,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
             .map(obj => obj.clientId);
 
         // Trigger notification to all clients who have an active subscription
-        await triggerMultipleNotification("Hey Pro users!!! Some changes had been made ﮩ٨ـﮩﮩ٨ـ♡ﮩ٨ـﮩ", plan.advisorId, activeClientIds);
+        await triggerMultipleNotification(`Hey Pro users!!! Some changes had been made ${plan.name}`, plan.advisorId, activeClientIds);
     } else {
         // Exclude client IDs from boughtClientIds that are already in activeClientIds
         // const boughtClientIds = plan.boughtClientIds.filter(clientId => {
