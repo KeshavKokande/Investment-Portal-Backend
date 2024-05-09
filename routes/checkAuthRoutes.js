@@ -21,5 +21,5 @@ router.patch('/resetPassword/:token', authController.resetPassword)
 // router.get('/signin-google', passport.authenticate('google', { scope: ['profile', 'email'] })); //http://localhost:3000/ap1/v1/check-auth/signin-google
 // router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login', session: false }), authController.OauthJWTtoken);
 router.get('/signin-google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: 'http://localhost:3000/login' ,session: false }), authController.OauthJWTtoken);
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: 'https://invest-public.azurewebsites.net/login' ,session: false }), authController.OauthJWTtoken);
 module.exports = router;

@@ -28,8 +28,8 @@ const createSendToken = (user, statusCode, res) => {
     const token = signToken(user.email);
 
     const cookieOptions = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: false
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000)
+        //httpsOnly: true
     };
 
     // if(process.env.NODE_ENV === 'production'x){
@@ -44,11 +44,6 @@ const createSendToken = (user, statusCode, res) => {
         token,
         user
     });
-    // if(user.role === 'client'){
-    //     res.redirect('/api/v1/check-auth/welcome-client');
-    // } else {
-    //     res.redirect('/api/v1/check-auth/welcome-advisor');
-    // }
 }
 
 exports.signup = asyncErrorHandler(async (req, res, next) => {
@@ -149,7 +144,7 @@ exports.restrictTo = (role) => {
 exports.logout = (req, res, next) => {
     const cookieOptions = {
         expires: new Date(Date.now() - 10 * 1000), // Set to expire 10 seconds ago
-        httpOnly: false
+        httpOnly: true
     };
 
     // Set the cookie 'jwt' with an expired date, effectively deleting it
@@ -309,7 +304,7 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
  
     const cookieOptions = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: false
+        httpOnly: true
     };
  
     res.cookie('jwt', token, cookieOptions);
@@ -318,9 +313,9 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     if(!registeredUser){
         res.cookie('name',user.name);
         res.cookie('email',user.email);
-        res.redirect("http://localhost:3000/client_registration_form");
+        res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
     } else {
-        res.redirect("http://localhost:3000/client_dashboard")
+        res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
     }
    
 })
