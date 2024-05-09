@@ -407,6 +407,7 @@ exports.listOfSubscribedPlansDetails = asyncErrorHandler( async(req, res, next) 
 
 exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
     const plans = await Plan.find();
+    const advisors = await Advisor.find();
 
     const client = await Client.findOne({ userIdCredentials: req.user._id });
     const currentDate = new Date();
@@ -427,7 +428,15 @@ exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
                 }
             }
         }
-        return { ...plan.toObject(), isSubscribed }; // Include isSubscribed in the plan object
+
+        // Find the advisor for this plan
+        const advisor = advisors.find((adv) => adv._id.toString() === plan.advisorId.toString());
+        const advisorName = advisor ? advisor.name : 'Unknown';
+        const category = advisor ? advisor.category: 'standard';
+        
+        
+
+        return { ...plan.toObject(), isSubscribed, advisorName, category }; // Include isSubscribed and advisorName in the plan object
     });
 
     const resolvedPlans = await Promise.all(plansWithSubscribedStatus); // Wait for all plans to be resolved
