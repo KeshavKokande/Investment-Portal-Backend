@@ -89,7 +89,7 @@ exports.topPlans = asyncErrorHandler(async (req, res, next) => {
     const plans = await Plan.aggregate([
         { $match: { advisorId: advisor._id, boughtClientIds: { $ne: [] } } },
         { $sort: { 'boughtClientIds.length': -1 } },
-        { $limit: 5 }
+        { $limit: 6 }
       ]);
     res.status(200).json({
         status: 'success',
@@ -317,7 +317,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
             .map(obj => obj.clientId);
 
         // Trigger notification to all clients who have an active subscription
-        await triggerMultipleNotification("Hey Pro users!!! Some changes had been made ﮩ٨ـﮩﮩ٨ـ♡ﮩ٨ـﮩ", senderId, activeClientIds);
+        await triggerMultipleNotification("Hey Pro users!!! Some changes had been made ﮩ٨ـﮩﮩ٨ـ♡ﮩ٨ـﮩ", plan.advisorId, activeClientIds);
     } else {
         // Exclude client IDs from boughtClientIds that are already in activeClientIds
         // const boughtClientIds = plan.boughtClientIds.filter(clientId => {
@@ -325,7 +325,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
         // });
 
         // Trigger notification to clients who have invested in the plan but are not subscribed
-        await triggerMultipleNotification("Hey free loaders, somethings cookin (ꈍᴗꈍ) !!!", senderId, plan.boughtClientIds);
+        await triggerMultipleNotification("Hey free loaders, somethings cookin (ꈍᴗꈍ) !!!", plan.advisorId, plan.boughtClientIds);
     }
 
     res.status(200).json({
