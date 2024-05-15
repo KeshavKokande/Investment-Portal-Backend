@@ -574,8 +574,6 @@ exports.login = asyncErrorHandler(async(req, res, next) => {
         return next(new AppError('Invalid Credentials!!! :('))
     }
 
-    await sendOnboardingEmail(user.email);
-
     createSendToken(user, 200, res);
 })
 
