@@ -27,30 +27,24 @@ const signToken = (email) => {
 const createSendToken = (user, statusCode, res) => {
     const token = signToken(user.email);
 
-    const cookieOptions = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        sameSite: 'None',
-        secure: true
-    };
+    // const cookieOptions = {
+    //     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000)
+    //     //httpsOnly: true
+    // };
 
     // if(process.env.NODE_ENV === 'production'x){
     //     cookieOptions.secure = true
     // }
 
-    res.cookie('jwt', token, cookieOptions);
+    // res.cookie('jwt', token, cookieOptions);
 
     user.password = undefined;
+
     res.status(statusCode).json({
         status: 'success',
         token,
         user
     });
-    // if(user.role === 'client'){
-    //     res.redirect('/api/v1/check-auth/welcome-client');
-    // } else {
-    //     res.redirect('/api/v1/check-auth/welcome-advisor');
-    // }
 }
 
 exports.signup = asyncErrorHandler(async (req, res, next) => {
@@ -149,18 +143,17 @@ exports.restrictTo = (role) => {
 }
 
 exports.logout = (req, res, next) => {
-    const cookieOptions = {
-        expires: new Date(Date.now() - 10 * 1000), // Set to expire 10 seconds ago
-        httpOnly: true
-    };
+    // const cookieOptions = {
+    //     expires: new Date(Date.now() - 10 * 1000), // Set to expire 10 seconds ago
+    //     httpOnly: true
+    // };
 
-    // Set the cookie 'jwt' with an expired date, effectively deleting it
-    res.cookie('jwt', '', cookieOptions);
+    // // Set the cookie 'jwt' with an expired date, effectively deleting it
+    // res.cookie('jwt', '', cookieOptions);
     res.status(200).json({ 
         status: 'success',
         message: 'Logged Out !!! :)'
     });
-    // res.redirect('/api/v1/check-auth/home');
 };
 
 
@@ -261,7 +254,7 @@ exports.resetPassword = asyncErrorHandler(async(req, res, next) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://team4api.azurewebsites.net/api/v1/check-auth/auth/google/callback",
+    callbackURL: "/api/v1/check-auth/auth/google/callback",
     passReqToCallback: true
     },
     async function (request, accessToken, refreshToken, profile, done)  {
@@ -309,21 +302,25 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
         expiresIn: process.env.JWT_EXPIRES_IN
     });
  
-    const cookieOptions = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        sameSite: 'None',
-        secure: true,
-        domain: '.azurewebsites.net'
-    };
+    // const cookieOptions = {
+    //     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    //     httpOnly: true
+    // };
  
-    res.cookie('jwt', token, cookieOptions);
+    // res.cookie('jwt', token, cookieOptions);
     const user = await User.findById(req.user);
     const registeredUser = await Client.findOne({ userIdCredentials: user._id });
-    if(!registeredUser){
-        res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
-    } else {
-        res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
-    }
+    // if(!registeredUser){
+    //     res.cookie('name',user.name);
+    //     res.cookie('email',user.email);
+    //     res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
+    // } else {
+    //     res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
+    // }
+
+    res.status(200).json({
+        status: "success",
+        token
+    })
    
 })

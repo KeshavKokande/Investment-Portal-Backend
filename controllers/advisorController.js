@@ -97,7 +97,7 @@ exports.topPlans = asyncErrorHandler(async (req, res, next) => {
     const plans = await Plan.aggregate([
         { $match: { advisorId: advisor._id, boughtClientIds: { $ne: [] } } },
         { $sort: { 'boughtClientIds.length': -1 } },
-        { $limit: 5 }
+        { $limit: 6 }
       ]);
     res.status(200).json({
         status: 'success',

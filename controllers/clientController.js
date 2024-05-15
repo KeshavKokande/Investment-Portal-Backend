@@ -267,6 +267,7 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
 
     await client.save();
 
+
     notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
     res.status(201).json({
@@ -446,6 +447,7 @@ exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
         plans: resolvedPlans
     });
 });
+
 
 exports.getAdvisor = asyncErrorHandler(async (req, res, next) => {
     const advisorId = req.params.advisorId;
