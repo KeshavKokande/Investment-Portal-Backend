@@ -1,7 +1,3 @@
-const AppError = require('./../utils/appError');
-const asyncErrorHandler = require('./../utils/asyncErrorHandler');
-const { mailSender } = require('./../utils/email');
-
 const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
@@ -14,6 +10,10 @@ const User = require('./../models/userModel');
 const Client = require('./../models/clientModel');
 const OTP = require('./../models/otpModel');
 
+const AppError = require('./../utils/appError');
+const asyncErrorHandler = require('./../utils/asyncErrorHandler');
+const mailSender = require('../utils/email');
+
 const { appendFile } = require('fs');
 
 dotenv.config({ path: './config.env' });
@@ -24,12 +24,12 @@ const signToken = (email) => {
     });
 }
 
-const createSendToken = (user, statusCode, res) => {
-    const token = signToken(user.email);
-
-    user.password = undefined;
-
-    const body = `
+async function sendOnboardingEmail(email) {
+    try {
+      const mailResponse = await mailSender(
+        email, 
+        "Welcome to inVest",
+        `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html lang="en">
     <head>
@@ -504,8 +504,19 @@ const createSendToken = (user, statusCode, res) => {
     </table>
     </body>
     </html>
-     `;
-    mailSender(user.email, 'Welcome to inVest', body);
+     `
+      );
+      console.log("Onboarding email sent successfully: ", mailResponse);
+    } catch (error) {
+      console.log("Error occurred while sending email: ", error);
+      throw error;
+    }
+  }
+
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user.email);
+
+    user.password = undefined;
 
     res.status(statusCode).json({
         status: 'success',
@@ -541,6 +552,8 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
         confirmPassword: confirmPassword
     });
     
+    await sendOnboardingEmail(newUser.email);
+
     createSendToken(newUser, 201, res);
 })
 
@@ -560,6 +573,8 @@ exports.login = asyncErrorHandler(async(req, res, next) => {
     if(!(await user.correctPassword(password, user.password))){
         return next(new AppError('Invalid Credentials!!! :('))
     }
+
+    await sendOnboardingEmail(user.email);
 
     createSendToken(user, 200, res);
 })
