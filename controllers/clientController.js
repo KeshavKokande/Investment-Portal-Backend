@@ -277,6 +277,31 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+exports.getFreeVsPremInvestedAmt = asyncErrorHandler(async (req, res, next) => {
+    const client = await Client.findOne({ _id: userIdCredentials });
+
+    const transactions = await Transaction.find({ clientId: client._id });
+
+    let totalInvestedAmount = {
+        free: 0,
+        premium: 0
+    };
+
+    transactions.forEach(transaction => {
+        if (transaction.isPremium) {
+            totalInvestedAmount.premium += transaction.investedAmount;
+        } else {
+            totalInvestedAmount.free += transaction.investedAmount;
+        }
+    });
+
+    res.status(200).json({
+        status: "success",
+        totalInvestedAmount
+    });
+});
+
+
 exports.investedPlans = asyncErrorHandler(async (req, res, next) => {
     const client = await Client.findOne({ userIdCredentials: req.user._id });
 

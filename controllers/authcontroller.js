@@ -13,6 +13,7 @@ const OTP = require('./../models/otpModel');
 const AppError = require('./../utils/appError');
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const mailSender = require('../utils/email');
+const { getOnboardingWelcomeMessage } = require("../utils/getPlanDescrpGenAI");
 
 const { appendFile } = require('fs');
 
@@ -24,7 +25,7 @@ const signToken = (email) => {
     });
 }
 
-async function sendOnboardingEmail(email) {
+async function sendOnboardingEmail(email, welcomeMSG) {
     try {
       const mailResponse = await mailSender(
         email, 
@@ -33,21 +34,6 @@ async function sendOnboardingEmail(email) {
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html lang="en">
     <head>
-    <!--[if gte mso 9]>
-                <xml>
-                    <o:OfficeDocumentsettings>
-                    <o:AllowPNG/>
-                    <o:PixelsPerInch>96</o:PixelsPerInch>
-                    </o:OfficeDocumentsettings>
-                </xml>
-            <![endif]-->
-    <!--[if gt mso 15]>
-         <style type="text/css" media="all">
-         /* Outlook 2016 Height Fix */
-         table, tr, td {border-collapse: collapse;}
-         tr { font-size:0px; line-height:0px; border-collapse: collapse; }
-         </style>
-         <![endif]-->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -243,7 +229,7 @@ async function sendOnboardingEmail(email) {
                                     <table cellpadding="0" cellspacing="0" border="0" align="center" role="presentation">
                                     <tr>
                                         <td align="center">
-                                            <img src="assets/logo-dark-01.png" alt="Logo" width="220" height="35" class="logo">
+                                            <img src="invest-logo.png" alt="Logo" width="220" height="35" class="logo">
                                         </td>
                                     </tr>
                                     </table>
@@ -284,7 +270,7 @@ async function sendOnboardingEmail(email) {
                     </tr>
                     <tr>
                         <td align="center" style="color:#FFFFFF;padding:20px 40px 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:normal;font-size:16px;-webkit-font-smoothing:antialiased;line-height:1.4;" class="table-container">
-                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                             ${welcomeMSG}
                         </td>
                     </tr>
                     <tr>
@@ -335,7 +321,7 @@ async function sendOnboardingEmail(email) {
             </tr>
             <tr>
                 <td align="center" style="color:#5a5a5a;text-align:left;padding:20px 40px 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:normal;font-size:16px;-webkit-font-smoothing:antialiased;line-height:1.4;" class="table-container">
-                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    ${welcomeMSG}
                 </td>
             </tr>
             <tr>
@@ -344,7 +330,7 @@ async function sendOnboardingEmail(email) {
             </tr>
             <tr>
                 <td align="center" style="color:#5a5a5a;text-align:left;padding:0px 40px 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:normal;font-size:16px;-webkit-font-smoothing:antialiased;line-height:1.4;" class="table-container">
-                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    ${welcomeMSG}
                 </td>
             </tr>
             </tbody>
@@ -359,11 +345,11 @@ async function sendOnboardingEmail(email) {
             <tbody>
             <tr>
                 <td align="left" width="64" style="color:#5a5a5a;text-align:left;padding:20px 0 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:bold;font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.4;">
-                    <img src="assets/avatar-01.png" alt="Section Image" width="64" height="64" class="avatar-img">
+                    <img src="/public/avatar-01.png" alt="Section Image" width="64" height="64" class="avatar-img">
                 </td>
                 <td align="left" width="576" style="color:#5a5a5a;text-align:left;padding:20px 0 0 20px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:bold;font-size:15px;-webkit-font-smoothing:antialiased;line-height:1.4;">
                      Sincerely,<br>
-                     Shubham Goswami, CEO @ inVEST
+                     Mukul Patwal, CEO @ inVEST
                 </td>
             </tr>
             </tbody>
@@ -394,16 +380,16 @@ async function sendOnboardingEmail(email) {
                     <tbody>
                     <tr class="social-icons">
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="assets/social-facebook-white.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-facebook.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="assets/social-twitter-white.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-twitter.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="assets/social-linkedin-white.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-linkedin.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="assets/social-instagram-white.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-instagram.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                     </tr>
                     </tbody>
@@ -462,7 +448,7 @@ async function sendOnboardingEmail(email) {
                     </tr>
                     <tr>
                         <td align="center">
-                            <img src="assets/logo-mailersend-01.png" alt="MailerSend Logo" width="129" height="29" class="logo-footer">
+                            <img src="/public/invest-logo.png" alt="MailerSend Logo" width="129" height="29" class="logo-footer">
                         </td>
                     </tr>
                     </tbody>
@@ -552,7 +538,9 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
         confirmPassword: confirmPassword
     });
     
-    await sendOnboardingEmail(newUser.email);
+    const mailBody = await getOnboardingWelcomeMessage(newUser.name);
+
+    await sendOnboardingEmail(newUser.email, mailBody);
 
     createSendToken(newUser, 201, res);
 })

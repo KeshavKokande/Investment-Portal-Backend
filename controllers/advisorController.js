@@ -9,7 +9,7 @@ const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const { triggerMultipleNotification } = require("../utils/notification");
-const getPlanDescrpGenAI = require("../utils/getPlanDescrpGenAI");
+const { getPlanDescription } = require("../utils/getPlanDescrpGenAI");
 
 // Edit
 // 1. Existing Stock qty === 0, it should be deleted
@@ -38,7 +38,7 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
 exports.getGenAIPlan = asyncErrorHandler(async (req, res, next) => {
     const stocks = req.body.stocks;
 
-    const planAdvise = await getPlanDescrpGenAI(stocks);
+    const planAdvise = await getPlanDescription(stocks);
 
     res.status(200).json({
         status: "success",

@@ -1,38 +1,21 @@
-const mongoose = require("mongoose");
-const axios = require('axios');
+const mongoose = require('mongoose');
 
-const stockSchema = new mongoose.Schema({
-    symbol: {
-        type: String,
-        unique: true,
-        uppercase: true
-    },
-    historical: {
-      type: [
-        {
-          date: String,
-          open: Number,
-          high: Number,
-          low: Number,
-          close: Number,
-          adjClose: Number,
-          volume: Number,
-          unadjustedVolume: Number,
-          change: Number,
-          changePercent: Number,
-          vwap: Number,
-          label: String,
-          changeOverTime: Number,
-        },
-      ],
-      select: false
-    },
+const Schema = mongoose.Schema;
+
+// Define the schema for your collection
+const stocksSchema = new Schema({
+    symbol: String,
+    data: [{
+        date: Date,
+        price: Number,
+    }],
 }, {
-    collection: "stocks",
-    versionKey: false,
-    timestamps: true
+  collection: "stock_prices",
+  versionKey: false,
+  timestamps: true
 });
 
-const Stock = mongoose.model('Stock', stockSchema);
+// Create a model based on the schema
+const Stock = mongoose.model('Stock', stocksSchema);
 
 module.exports = Stock;

@@ -8,7 +8,8 @@ const notification = require("./../utils/notification");
 
 const stocks = require('./../utils/nse-stocks-data');
 
-router.post('/register-client', authController.protect, authController.restrictTo('client'), clientController.register)
+router.post('/register-client', authController.protect, authController.restrictTo('client'), clientController.register);
+router.post('/get-free-Vs-subsp-InvstedAmt', authController.protect, authController.restrictTo('client'), clientController.getFreeVsPremInvestedAmt);
 router.get('/get-all-advisors', authController.protect, authController.restrictTo('client'), clientController.listOfAllAdvisors);
 router.get('/list-of-plans/:advisorId', authController.protect, authController.restrictTo('client'), clientController.listOfPlans)
 router.post('/subscribePlan/advisor/:advisorId/plan/:planId', authController.protect, authController.restrictTo('client'), clientController.buyASubscription);
