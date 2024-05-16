@@ -4,15 +4,15 @@ const dotenv = require("dotenv");
 
 dotenv.config({ path: './config.env' });
 
-// const DB = process.env.DATABASE.replace(
-//     '<PASSWORD>',
-//     process.env.DATABASE_PASSWORD
-// );
-
 const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
+    '<PASSWORD>',
+    process.env.DATABASE_PASSWORD
 );
+
+// const DB = process.env.MANRAN_DB.replace(
+//   '<PASSWORD>',
+//   process.env.MANRAN_DB_PSWD
+// );
   
 mongoose
   .connect(DB)
