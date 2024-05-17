@@ -1,6 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Access your API key as an environment variable || `AIzaSyDOPt0fkC3LA74JL2MOCY5kTx_l2uSn1Sk`
+// Access your API key as an environment variable
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 async function getPlanDescription(stocks) {
