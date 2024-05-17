@@ -130,7 +130,6 @@ exports.calculateSTS = asyncErrorHandler(async(req, res, next) => {
 
 // Function to calculate stocks
 exports.calculateStocks = asyncErrorHandler(async(req, res, next) => {
-    console.log("HEYYYYYY !!!!!!"); 
     const stocksData = req.body.stocks;
     let results = [];
     for (let stock of stocksData) {
