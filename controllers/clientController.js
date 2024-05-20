@@ -7,6 +7,7 @@ const Transaction = require("../models/transactionModel");
 const Notification = require("../models/notificationModel");
 
 const notification = require("./../utils/notification");
+const { interestingFinancialInvestmentFact } = require("./../utils/getPlanDescrpGenAI");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const AppError = require('../utils/appError');
 
@@ -327,24 +328,6 @@ exports.listOfAdvisors = asyncErrorHandler(async (req, res, next) => {
 })
 
 exports.listOfSubscribedPlans = asyncErrorHandler(async (req, res, next) => {
-    // const client = await Client.findOne({ userIdCredentials: req.user._id });
-
-    // const transactions = await Transaction.find({ clientId: client._id });
-
-    // const AdvisorIds = transactions.map(transaction => {
-    //     return transaction.advisorId
-    // });
-
-    // const advisorNames = await Promise.all(AdvisorIds.map(async (id) => {
-    //     const advisor = await Advisor.findById(id).  select('name');
-    //     return advisor.name; // Return the name of the advisor
-    // }));
-
-    // res.status(200).json({
-    //     status: 'success',
-    //     transactions,
-    //     advisorNames
-    // });
 
     const client = await Client.findOne({ userIdCredentials: req.user._id });
     const currentDate = new Date();
@@ -386,6 +369,15 @@ exports.listOfSubscribedPlans = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         plans
+    });
+})
+
+exports.getInvestmentTip = asyncErrorHandler(async (req, res, next) => {
+    const fact = await interestingFinancialInvestmentFact(req.user.name);
+
+    res.status(200).json({
+        status: "success",
+        fact
     });
 })
 
