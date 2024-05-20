@@ -6,7 +6,7 @@ const User = require('../models/userModel');
 const asyncErrorHandler = require("./../utils/asyncErrorHandler");
 const AppError = require("./../utils/appError");
 
-exports.sendOTP = asyncErrorHandler(async (req, res) => {
+exports.sendOTP = asyncErrorHandler(async (req, res, next) => {
     const { email } = req.body;
     // Check if user is already present
     const checkUserPresent = await User.findOne({ email });

@@ -277,6 +277,31 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+exports.getFreeVsPremInvestedAmt = asyncErrorHandler(async (req, res, next) => {
+    const client = await Client.findOne({ userIdCredentials: req.user._id });
+
+    const transactions = await Transaction.find({ clientId: client._id });
+
+    let totalInvestedAmount = {
+        free: 0,
+        premium: 0
+    };
+
+    transactions.forEach(transaction => {
+        if (transaction.isPremium) {
+            totalInvestedAmount.premium += transaction.investedAmount;
+        } else {
+            totalInvestedAmount.free += transaction.investedAmount;
+        }
+    });
+
+    res.status(200).json({
+        status: "success",
+        totalInvestedAmount
+    });
+});
+
+
 exports.investedPlans = asyncErrorHandler(async (req, res, next) => {
     const client = await Client.findOne({ userIdCredentials: req.user._id });
 
@@ -509,5 +534,40 @@ exports.allTransactions = asyncErrorHandler(async (req, res, next) => {
         status: 'success',
         transactions,
         advisorNames
+    });
+});
+
+exports.daysLeftForSubpExpOfAllPlans = asyncErrorHandler(async (req, res, next) => {
+    // Find the client by user credentials
+    const client = await Client.findOne({ userIdCredentials: req.user._id });
+
+    // If no client found, return an error
+    if (!client) {
+        return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Fetch plan details for each subscribed plan
+    const planDetailsPromises = client.subscribedPlanIds.map(async plan => {
+        const planDetails = await Plan.findById(plan.planId); // Assuming you have a Plan model to fetch details
+        const subscriptionExpires = new Date(plan.subscriptionExpires);
+        const timeDiff = subscriptionExpires - currentDate;
+        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+        return {
+            planId: plan.planId,
+            planName: planDetails ? planDetails.planName : 'Unknown Plan', // Use a default name if the plan is not found
+            daysLeft
+        };
+    });
+
+    // Resolve all promises
+    const daysLeftForPlans = await Promise.all(planDetailsPromises);
+
+    // Send the response with the days left for each plan
+    res.status(200).json({
+        status: "success",
+        daysLeftForPlans
     });
 });

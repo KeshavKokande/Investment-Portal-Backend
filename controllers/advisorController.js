@@ -9,7 +9,8 @@ const Notification = require('./../models/notificationModel');
 
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const { triggerMultipleNotification } = require("../utils/notification");
-const getPlanDescrpGenAI = require("../utils/getPlanDescrpGenAI");
+const { getPlanDescription } = require("../utils/getPlanDescrpGenAI");
+const AppError = require("../utils/appError");
 
 // Edit
 // 1. Existing Stock qty === 0, it should be deleted
@@ -38,7 +39,7 @@ exports.register = asyncErrorHandler(async (req, res, next) => {
 exports.getGenAIPlan = asyncErrorHandler(async (req, res, next) => {
     const stocks = req.body.stocks;
 
-    const planAdvise = await getPlanDescrpGenAI(stocks);
+    const planAdvise = await getPlanDescription(stocks);
 
     res.status(200).json({
         status: "success",
@@ -409,3 +410,69 @@ exports.ratioOfToatalInvestedAmt = asyncErrorHandler(async (req, res, next) => {
         premiumPlans: totalInvestedAmtPremiumPlans
     });
 })
+
+exports.noOfSoldPlansMonthWiseFreeVsPrem = asyncErrorHandler(async (req, res, next) => {
+    // Find the advisor by user credentials
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+
+    // If no advisor found, return an error
+    if (!advisor) {
+        return next(new AppError('Advisor not found', 404));
+    }
+
+    // Aggregate transactions to get the month-wise count of free and premium plans
+    const transactions = await Transaction.aggregate([
+        // Match transactions for the specific advisor
+        { $match: { advisorId: advisor._id } },
+        // Group by year and month, and separate free and premium plans
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$date" },
+                    month: { $month: "$date" },
+                    isPremium: "$isPremium"
+                },
+                count: { $sum: 1 }
+            }
+        },
+        // Sort by year and month in descending order
+        { $sort: { "_id.year": -1, "_id.month": -1 } },
+        // Group again to restructure the output
+        {
+            $group: {
+                _id: { year: "$_id.year", month: "$_id.month" },
+                plans: {
+                    $push: {
+                        isPremium: "$_id.isPremium",
+                        count: "$count"
+                    }
+                }
+            }
+        },
+        // Project to format the output
+        {
+            $project: {
+                _id: 0,
+                year: "$_id.year",
+                month: "$_id.month",
+                plans: {
+                    $arrayToObject: {
+                        $map: {
+                            input: "$plans",
+                            as: "plan",
+                            in: {
+                                k: { $cond: { if: "$$plan.isPremium", then: "premium", else: "free" } },
+                                v: "$$plan.count"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        ststus: "success",
+        transactions
+    });
+});
