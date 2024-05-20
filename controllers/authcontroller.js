@@ -13,7 +13,7 @@ const OTP = require('./../models/otpModel');
 const AppError = require('./../utils/appError');
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const mailSender = require('../utils/email');
-const { getOnboardingWelcomeMessage } = require("../utils/getPlanDescrpGenAI");
+const { getOnboardingWelcomeMessage, getOnbardingExploreFeature, interestingFinancialInvestmentFact } = require("../utils/getPlanDescrpGenAI");
 
 const { appendFile } = require('fs');
 
@@ -777,7 +777,20 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
  
     // res.cookie('jwt', token, cookieOptions);
     const user = await User.findById(req.user);
+
     const registeredUser = await Client.findOne({ userIdCredentials: user._id });
+    let newUser = '';
+    const fact = await interestingFinancialInvestmentFact(user.name);
+    let wlcmMSG = '';
+    let usersJourney = '';
+
+    if(!registeredUser){
+        newUser =true;
+        wlcmMSG = await getOnboardingWelcomeMessage(user.name);
+        usersJourney = await getOnbardingExploreFeature(user.name);
+    } else {
+        newUser = false;
+    }
     // if(!registeredUser){
     //     res.cookie('name',user.name);
     //     res.cookie('email',user.email);
@@ -786,9 +799,14 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     //     res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
     // }
 
+
     res.status(200).json({
         status: "success",
-        token
-    })
+        token,
+        newUser,
+        wlcmMSG,
+        usersJourney,
+        fact
+    });
    
 })
