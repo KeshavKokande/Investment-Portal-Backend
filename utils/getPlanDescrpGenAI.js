@@ -33,6 +33,7 @@ async function getOnbardingExploreFeatures(userName) {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
+    console.log("Users Journey Generated....")
     return text;
 }
 
@@ -44,6 +45,7 @@ async function interestingFinancialInvestmentFact(userName) {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
+    console.log("Interesting Investment Fact tip generated....")
     return text;
 }
 

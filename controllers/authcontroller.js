@@ -13,7 +13,7 @@ const OTP = require('./../models/otpModel');
 const AppError = require('./../utils/appError');
 const asyncErrorHandler = require('./../utils/asyncErrorHandler');
 const mailSender = require('../utils/email');
-const { getOnboardingWelcomeMessage, getOnbardingExploreFeature, interestingFinancialInvestmentFact } = require("../utils/getPlanDescrpGenAI");
+const { getOnboardingWelcomeMessage, getOnbardingExploreFeatures, interestingFinancialInvestmentFact } = require("../utils/getPlanDescrpGenAI");
 
 const { appendFile } = require('fs');
 
@@ -25,7 +25,7 @@ const signToken = (email) => {
     });
 }
 
-async function sendOnboardingEmail(email, welcomeMSG) {
+async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
     try {
       const mailResponse = await mailSender(
         email, 
@@ -321,16 +321,11 @@ async function sendOnboardingEmail(email, welcomeMSG) {
             </tr>
             <tr>
                 <td align="center" style="color:#5a5a5a;text-align:left;padding:20px 40px 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:normal;font-size:16px;-webkit-font-smoothing:antialiased;line-height:1.4;" class="table-container">
-                    ${welcomeMSG}
+                    ${usersJourney}
                 </td>
             </tr>
             <tr>
                 <td height="10" style="line-height:10px;min-height:10px;">
-                </td>
-            </tr>
-            <tr>
-                <td align="center" style="color:#5a5a5a;text-align:left;padding:0px 40px 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:normal;font-size:16px;-webkit-font-smoothing:antialiased;line-height:1.4;" class="table-container">
-                    ${welcomeMSG}
                 </td>
             </tr>
             </tbody>
@@ -539,8 +534,9 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
     });
     
     const mailBody = await getOnboardingWelcomeMessage(newUser.name);
+    const usersJourney = await getOnbardingExploreFeatures(newUser.name);
 
-    await sendOnboardingEmail(newUser.email, mailBody);
+    await sendOnboardingEmail(newUser.email, mailBody, usersJourney);
 
     createSendToken(newUser, 201, res);
 })
