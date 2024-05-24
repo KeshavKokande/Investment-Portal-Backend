@@ -145,7 +145,8 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
     }
 
     const subscriptionExpires = new Date();
-    subscriptionExpires.setDate(subscriptionExpires.getDate() + req.body.planDays); // Assuming days subscription
+    const planDays = +req.body.planDays;
+    subscriptionExpires.setDate(subscriptionExpires.getDate() + planDays); // Assuming days subscription
 
     if (existingClientSubscription) {
         // If subscription exists but expired, update subscription date and expiration
