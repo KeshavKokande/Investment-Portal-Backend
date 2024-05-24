@@ -114,6 +114,7 @@ exports.calculateSTS = asyncErrorHandler(async(req, res, next) => {
 
         let totalCurrentValue = results.reduce((acc, stock) => acc + parseFloat(stock.currentValue || 0), 0);
         responseData.push({
+            planId: planData._id,
             planName: planData.planName,
             individualStocks: results,
             totalCurrentGains: (((totalCurrentValue + parseFloat(planData.cash || 0) - parseFloat(planData.startVal || 0)) / Math.max(parseFloat(planData.startVal || 1), 1)) * 100).toFixed(2),

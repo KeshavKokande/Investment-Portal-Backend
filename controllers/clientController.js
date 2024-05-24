@@ -242,30 +242,30 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     });
 
     // Find the index of the plan in client.planData array
-    const planIndex = client.planData.findIndex(data => data.planId === plan.planId);
-
+    const planIndex = client.planData.findIndex(data => String(data.planId) === String(plan._id));
+ 
     if (planIndex !== -1) {
         // If the plan exists, update its details
         const existingData = client.planData[planIndex];
-        const newQty = req.body.qty + existingData.qty;
-        const newAvgPrice = ((req.body.price * req.body.qty) + (existingData.avgPrice * existingData.qty)) / newQty;
-
+        const newQty = parseFloat(req.body.qty) + parseFloat(existingData.qty);
+        const newAvgPrice = ((parseFloat(req.body.price) * parseFloat(req.body.qty)) + (parseFloat(existingData.avgPrice) * parseFloat(existingData.qty))) / newQty;
+ 
         // Update planData
         client.planData[planIndex].qty = newQty;
         client.planData[planIndex].avgPrice = newAvgPrice;
     } else {
         // If the plan doesn't exist, create a new document
         const newDocument = {
-            planId: plan.planId,
+            planId: plan._id,
             planName: plan.planName,
-            avgPrice: req.body.price,
-            qty: req.body.qty
+            avgPrice: parseFloat(req.body.price),
+            qty: parseFloat(req.body.qty)
         };
-
+ 
         // Add the new document to planData
         client.planData.push(newDocument);
     }
-
+ 
     await client.save();
 
 
