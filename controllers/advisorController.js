@@ -413,7 +413,7 @@ exports.ratioOfToatalInvestedAmt = asyncErrorHandler(async (req, res, next) => {
 
 exports.noOfSoldPlansMonthWiseFreeVsPrem = asyncErrorHandler(async (req, res, next) => {
     // Find the advisor by user credentials
-    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id }).sort({ date: -1, investedAmount: -1 });
 
     // If no advisor found, return an error
     if (!advisor) {
@@ -474,5 +474,59 @@ exports.noOfSoldPlansMonthWiseFreeVsPrem = asyncErrorHandler(async (req, res, ne
     res.status(200).json({
         ststus: "success",
         transactions
+    });
+});
+
+exports.topInvestors = asyncErrorHandler(async (req, res, next) => {
+    // Step 1: Find the advisor by user ID
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+    if (!advisor) {
+        return res.status(404).json({ message: 'Advisor not found' });
+    }
+
+    // Step 2: Aggregate transactions to find top investors
+    const pipeline = [
+        {
+            $match: { advisorId: advisor._id }  // Filter transactions by advisorId
+        },
+        {
+            $group: {
+                _id: { clientId: "$clientId", planId: "$planId" }, // Group by clientId and planId to get unique plans per client
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.clientId",   // Group by clientId to count the unique plans per client
+                uniquePlansCount: { $sum: 1 }
+            }
+        },
+        {
+            $sort: { uniquePlansCount: -1 }  // Sort by the count of unique plans in descending order
+        },
+        {
+            $lookup: {
+                from: "clients", // Assuming the clients collection is named "clients"
+                localField: "_id",
+                foreignField: "_id",
+                as: "clientInfo"
+            }
+        },
+        {
+            $unwind: "$clientInfo" // Unwind the client info to include it in the result
+        },
+        {
+            $project: {
+                _id: 0,
+                clientId: "$_id",
+                clientName: "$clientInfo.name",
+                uniquePlansCount: 1
+            }
+        }
+    ];
+
+    const topInvestors = await Transaction.aggregate(pipeline);
+
+    res.status(200).json({ 
+        topInvestors 
     });
 });
