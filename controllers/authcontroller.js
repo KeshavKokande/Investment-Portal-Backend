@@ -783,7 +783,7 @@ exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
     if(!registeredUser){
         newUser =true;
         wlcmMSG = await getOnboardingWelcomeMessage(user.name);
-        usersJourney = await getOnbardingExploreFeature(user.name);
+        usersJourney = await getOnbardingExploreFeatures(user.name);
     } else {
         newUser = false;
     }
