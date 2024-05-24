@@ -1,3 +1,4 @@
+const Client = require("../models/clientModel");
 const Notification = require("./../models/notificationModel");
 
 const asyncErrorHandler = require("./asyncErrorHandler");
@@ -20,8 +21,10 @@ exports.triggerNotification = async (message, senderId, recipientId) => {
 exports.triggerMultipleNotification = async (message, senderId, recipientIds) => {
     try {
         for (const recipientId of recipientIds) {
+            const client = await Client.findOne({ _id: recipientId });
+            const personalizedMessage = message.replace(/\*/g, client.name);  // Replace all occurrences of '*'
             const notification = new Notification({
-                message,
+                message: personalizedMessage,
                 sender: senderId,
                 recipient: recipientId
             });
