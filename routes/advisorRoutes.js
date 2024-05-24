@@ -28,6 +28,6 @@ router.get('/view-notification/:notificationId', authController.protect, authCon
 router.get('/view-notification', authController.protect, authController.restrictTo('advisor'), notification.viewNotification);
 router.get('/ratio-of-free-Vs-prem-plans-sold', authController.protect, authController.restrictTo('advisor'), advisorController.ratioOfPlansSold);
 router.get('/top-investors', authController.protect, authController.restrictTo('advisor'), advisorController.topInvestors);
-
+router.get('/top-investors-invstd-amt', authController.protect, authController.restrictTo('advisor'), advisorController.topInvestorsInvestedAmt);
 
 module.exports = router;
