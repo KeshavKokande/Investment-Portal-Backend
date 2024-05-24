@@ -27,7 +27,7 @@ router.get('/get-all-notifications', authController.protect, authController.rest
 router.get('/view-notification/:notificationId', authController.protect, authController.restrictTo('advisor'), notification.viewNotification);
 router.get('/view-notification', authController.protect, authController.restrictTo('advisor'), notification.viewNotification);
 router.get('/ratio-of-free-Vs-prem-plans-sold', authController.protect, authController.restrictTo('advisor'), advisorController.ratioOfPlansSold);
-router.get('/ratio-of-free-Vs-prem-plans-total-investedAmount', authController.protect, authController.restrictTo('advisor'), advisorController.ratioOfToatalInvestedAmt);
-
+router.get('/top-investors', authController.protect, authController.restrictTo('advisor'), advisorController.topInvestors);
+router.get('/top-investors-invstd-amt', authController.protect, authController.restrictTo('advisor'), advisorController.topInvestorsInvestedAmt);
 
 module.exports = router;

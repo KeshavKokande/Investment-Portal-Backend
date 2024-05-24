@@ -326,7 +326,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
             .map(obj => obj.clientId);
 
         // Trigger notification to all clients who have an active subscription
-        await triggerMultipleNotification(`Hey Pro users!!! Some changes had been made ${plan.planName}`, plan.advisorId, activeClientIds);
+        await triggerMultipleNotification(`Hey *, some changes had been made ${plan.planName}`, plan.advisorId, activeClientIds);
     } else {
         // Exclude client IDs from boughtClientIds that are already in activeClientIds
         // const boughtClientIds = plan.boughtClientIds.filter(clientId => {
@@ -413,7 +413,7 @@ exports.ratioOfToatalInvestedAmt = asyncErrorHandler(async (req, res, next) => {
 
 exports.noOfSoldPlansMonthWiseFreeVsPrem = asyncErrorHandler(async (req, res, next) => {
     // Find the advisor by user credentials
-    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id }).sort({ date: -1, investedAmount: -1 });
 
     // If no advisor found, return an error
     if (!advisor) {
@@ -474,5 +474,116 @@ exports.noOfSoldPlansMonthWiseFreeVsPrem = asyncErrorHandler(async (req, res, ne
     res.status(200).json({
         ststus: "success",
         transactions
+    });
+});
+
+exports.topInvestors = asyncErrorHandler(async (req, res, next) => {
+    // Step 1: Find the advisor by user ID
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+    if (!advisor) {
+        return res.status(404).json({ message: 'Advisor not found' });
+    }
+
+    // Step 2: Aggregate transactions to find top investors
+    const pipeline = [
+        {
+            $match: { advisorId: advisor._id }  // Filter transactions by advisorId
+        },
+        {
+            $group: {
+                _id: { clientId: "$clientId", planId: "$planId" }, // Group by clientId and planId to get unique plans per client
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.clientId",   // Group by clientId to count the unique plans per client
+                uniquePlansCount: { $sum: 1 }
+            }
+        },
+        {
+            $sort: { uniquePlansCount: -1 }  // Sort by the count of unique plans in descending order
+        },
+        {
+            $lookup: {
+                from: "clients", // Assuming the clients collection is named "clients"
+                localField: "_id",
+                foreignField: "_id",
+                as: "clientInfo"
+            }
+        },
+        {
+            $unwind: "$clientInfo" // Unwind the client info to include it in the result
+        },
+        {
+            $project: {
+                _id: 0,
+                clientId: "$_id",
+                clientName: "$clientInfo.name",
+                uniquePlansCount: 1
+            }
+        }
+    ];
+
+    const topInvestors = await Transaction.aggregate(pipeline);
+
+    res.status(200).json({ 
+        topInvestors 
+    });
+});
+
+exports.topInvestorsInvestedAmt = asyncErrorHandler(async (req, res, next) => {
+    // Step 1: Find the advisor by user ID
+    const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
+    if (!advisor) {
+        return res.status(404).json({ message: 'Advisor not found' });
+    }
+
+    // Step 2: Aggregate transactions to find top investors
+    const pipeline = [
+        {
+            $match: { advisorId: advisor._id }  // Filter transactions by advisorId
+        },
+        {
+            $group: {
+                _id: "$clientId",   // Group by clientId to count the total invested amount per client
+                uniquePlansCount: { $addToSet: "$planId" }, // Use $addToSet to get unique plan count
+                totalAmountInvested: { $sum: "$investedAmount" } // Sum the invested amounts for each client
+            }
+        },
+        {
+            $addFields: {
+                uniquePlansCount: { $size: "$uniquePlansCount" } // Convert uniquePlansCount from set to size
+            }
+        },
+        {
+            $sort: { uniquePlansCount: -1 }  // Sort by the count of unique plans in descending order
+        },
+        {
+            $lookup: {
+                from: "clients", // Assuming the clients collection is named "clients"
+                localField: "_id",
+                foreignField: "_id",
+                as: "clientInfo"
+            }
+        },
+        {
+            $unwind: "$clientInfo" // Unwind the client info to include it in the result
+        },
+        {
+            $project: {
+                _id: 0,
+                clientId: "$_id",
+                clientName: "$clientInfo.name",
+                uniquePlansCount: 1,
+                totalAmountInvested: 1
+            }
+        }
+    ];
+
+    const topInvestors = await Transaction.aggregate(pipeline);
+
+    res.status(200).json({
+        status: "success", 
+        topInvestors 
     });
 });
