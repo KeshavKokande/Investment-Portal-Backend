@@ -444,6 +444,9 @@ exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
                     // If subscription has expired, remove the client from subscribedClientIds array
                     plan.subscribedClientIds = plan.subscribedClientIds.filter(clientData => clientData.clientId !== client._id.toString());
                     await plan.save(); // Save the plan to persist changes
+
+                    client.subscribedPlanIds = client.subscribedPlanIds.filter(planData => planData.planId !== plan._id.toString());
+                    await client.save();
                 }
             }
         }
@@ -459,7 +462,6 @@ exports.browseAllPlans = asyncErrorHandler(async (req, res, next) => {
     });
 
     const resolvedPlans = await Promise.all(plansWithSubscribedStatus); // Wait for all plans to be resolved
-
     res.status(200).json({
         status: 'success',
         plans: resolvedPlans
