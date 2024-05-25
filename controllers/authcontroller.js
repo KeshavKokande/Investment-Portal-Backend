@@ -229,7 +229,7 @@ async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
                                     <table cellpadding="0" cellspacing="0" border="0" align="center" role="presentation">
                                     <tr>
                                         <td align="center">
-                                            <img src="invest-logo.png" alt="Logo" width="220" height="35" class="logo">
+                                        <img src="https://drive.google.com/uc?export=view&id=1VVi6txfAqzPmIxC9AX3-tS8eMEberhZY" alt="Logo" width="220" height="35" class="logo">
                                         </td>
                                     </tr>
                                     </table>
@@ -340,7 +340,7 @@ async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
             <tbody>
             <tr>
                 <td align="left" width="64" style="color:#5a5a5a;text-align:left;padding:20px 0 0 40px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:bold;font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.4;">
-                    <img src="/public/avatar-01.png" alt="Section Image" width="64" height="64" class="avatar-img">
+                <img src="https://drive.google.com/uc?export=view&id=179lS4W9H3ut3jenvqG39yMtG7fH-gJ3i" alt="Section Image" width="64" height="64" class="avatar-img">
                 </td>
                 <td align="left" width="576" style="color:#5a5a5a;text-align:left;padding:20px 0 0 20px;font-family: 'Lato', Arial, Helvetica, sans-serif;font-weight:bold;font-size:15px;-webkit-font-smoothing:antialiased;line-height:1.4;">
                      Sincerely,<br>
@@ -375,16 +375,16 @@ async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
                     <tbody>
                     <tr class="social-icons">
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-facebook.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                        <a href="https://www.facebook.com/IncedoInc/" target="_blank"><img src="https://drive.google.com/uc?export=view&id=19hhqtUi6pPKKbUeEvjHJ69xtHFBz1NGS" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-twitter.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                        <a href="https://www.x.com/IncedoInc/" target="_blank"><img src="https://drive.google.com/uc?export=view&id=1bstAJOYHMDN6DAPLpt4-0p-vjpXmLA_Q" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-linkedin.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                        <a href="https://www.linkedin.com/company/incedo-inc/" target="_blank"><img src="https://drive.google.com/uc?export=view&id=1qrmBCctKFTjmUJbast53T6J88w_BBHE1" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                         <td style="padding:0 10px 0 10px;">
-                            <a href="https://www.MailerSend.com/" target="_blank"><img src="social-instagram.png" alt="Social Icons" width="30" height="30" class="social-icon"></a>
+                        <a href="https://www.instagram.com/incedoinc/" target="_blank"><img src="https://drive.google.com/uc?export=view&id=11I44tSlbzbZgNuBaXxVL62Z7gTiotJKq" alt="Social Icons" width="30" height="30" class="social-icon"></a>
                         </td>
                     </tr>
                     </tbody>
@@ -403,7 +403,7 @@ async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
             <tr>
                 <td style="color:#FFFFFF; font-size:14px; line-height:22px; text-align:center;border:none;font-weight:bold;">
                      109 Udyog Vihar, Gurugram, Haryana 122015 <br>
-                     © 2023 inVEST <br>
+                     © 2024 inVEST <br>
                     </td>
             </tr>
             </table>
@@ -443,7 +443,7 @@ async function sendOnboardingEmail(email, welcomeMSG, usersJourney) {
                     </tr>
                     <tr>
                         <td align="center">
-                            <img src="/public/invest-logo.png" alt="MailerSend Logo" width="129" height="29" class="logo-footer">
+                        <img src="https://drive.google.com/uc?export=view&id=1VVi6txfAqzPmIxC9AX3-tS8eMEberhZY" alt="MailerSend Logo" width="129" height="29" class="logo-footer">
                         </td>
                     </tr>
                     </tbody>
