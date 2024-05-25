@@ -761,48 +761,75 @@ passport.deserializeUser(async( email, cb ) => {
     }
 })
  
-exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
+// exports.OauthJWTtoken = asyncErrorHandler(async(req, res, next) => {
+//     const token = jwt.sign({ email: req.user.email }, process.env.JWT_SECRET, {
+//         expiresIn: process.env.JWT_EXPIRES_IN
+//     });
+ 
+//     // const cookieOptions = {
+//     //     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+//     //     httpOnly: true
+//     // };
+ 
+//     // res.cookie('jwt', token, cookieOptions);
+//     const user = await User.findById(req.user);
+
+//     const registeredUser = await Client.findOne({ userIdCredentials: user._id });
+//     let newUser = '';
+//     const fact = await interestingFinancialInvestmentFact(user.name);
+//     let wlcmMSG = '';
+//     let usersJourney = '';
+
+//     if(!registeredUser){
+//         newUser =true;
+//         wlcmMSG = await getOnboardingWelcomeMessage(user.name);
+//         usersJourney = await getOnbardingExploreFeatures(user.name);
+//     } else {
+//         newUser = false;
+//     }
+//     // if(!registeredUser){
+//     //     res.cookie('name',user.name);
+//     //     res.cookie('email',user.email);
+//     //     res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
+//     // } else {
+//     //     res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
+//     // }
+
+
+//     res.status(200).json({
+//         status: "success",
+//         token,
+//         newUser,
+//         wlcmMSG,
+//         usersJourney,
+//         fact
+//     });
+   
+// })
+exports.OauthJWTtoken = asyncErrorHandler(async (req, res, next) => {
     const token = jwt.sign({ email: req.user.email }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
     });
- 
-    // const cookieOptions = {
-    //     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-    //     httpOnly: true
-    // };
- 
-    // res.cookie('jwt', token, cookieOptions);
-    const user = await User.findById(req.user);
 
-    const registeredUser = await Client.findOne({ userIdCredentials: user._id });
+    const registeredUser = await Client.findOne({ userIdCredentials: req.user._id });
+
     let newUser = '';
-    const fact = await interestingFinancialInvestmentFact(user.name);
+    const fact = await interestingFinancialInvestmentFact(req.user.name);
     let wlcmMSG = '';
     let usersJourney = '';
 
-    if(!registeredUser){
-        newUser =true;
-        wlcmMSG = await getOnboardingWelcomeMessage(user.name);
-        usersJourney = await getOnbardingExploreFeatures(user.name);
+    if (!registeredUser) {
+        newUser = true;
+        wlcmMSG = await getOnboardingWelcomeMessage(req.user.name);
+        usersJourney = await getOnbardingExploreFeatures(req.user.name);
+
+        await sendOnboardingEmail(req.user.email, wlcmMSG, usersJourney);
+
     } else {
         newUser = false;
     }
-    // if(!registeredUser){
-    //     res.cookie('name',user.name);
-    //     res.cookie('email',user.email);
-    //     res.redirect("https://invest-public.azurewebsites.net/client_registration_form");
-    // } else {
-    //     res.redirect("https://invest-public.azurewebsites.net/client_dashboard")
-    // }
 
-
-    res.status(200).json({
-        status: "success",
-        token,
-        newUser,
-        wlcmMSG,
-        usersJourney,
-        fact
-    });
-   
-})
+    // Send the token and additional information to a redirect URL
+    const redirectUrl = `https://invest-public.azurewebsites.net/api/v1/check-auth/auth/google/callback?token=${token}&newUser=${newUser}&fact=${encodeURIComponent(fact)}&wlcmMSG=${encodeURIComponent(wlcmMSG)}&usersJourney=${encodeURIComponent(usersJourney)}`;
+    res.redirect(redirectUrl);
+});
