@@ -184,11 +184,11 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
 
     await plan.save();
 
-    await triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
+    await triggerNotification(`${client.name} subscribed to your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
     res.status(201).json({
         status: 'success',
-        message: `${client.name} bought a premium plan`,
+        message: `${client.name} subscribed to a premium plan`,
     });
 });
 

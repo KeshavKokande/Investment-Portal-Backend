@@ -325,7 +325,6 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
             .filter(obj => obj.subscriptionExpires > currentDate)
             .map(obj => obj.clientId);
 
-        console.log(activeClientIds);
             // Trigger notification to all clients who have an active subscription
         await triggerMultipleNotification(`Hey *, some changes had been made ${plan.planName}`, plan.advisorId, activeClientIds);
     } else {
@@ -335,7 +334,7 @@ exports.editPlan = asyncErrorHandler(async (req, res, next) => {
         // });
 
         // Trigger notification to clients who have invested in the plan but are not subscribed
-        await triggerMultipleNotification("Hey free loaders, somethings cookin (ꈍᴗꈍ) !!!", plan.advisorId, plan.boughtClientIds);
+        await triggerMultipleNotification(`Hey *, some changes had been made ${plan.planName}`, plan.advisorId, plan.boughtClientIds);
     }
 
     res.status(200).json({
