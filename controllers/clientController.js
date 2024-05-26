@@ -5,9 +5,9 @@ const Advisor = require("../models/advisorModel");
 const Plan = require("../models/plansModel");
 const Transaction = require("../models/transactionModel");
 const Notification = require("../models/notificationModel");
-const { triggerNotification } = require("../utils/notification");
+const Stocks = require('./../models/stocksModel');
 
-// const notification = require("./../utils/notification");
+const { triggerNotification } = require("../utils/notification");
 const { interestingFinancialInvestmentFact } = require("./../utils/getPlanDescrpGenAI");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const AppError = require('../utils/appError');
@@ -278,6 +278,121 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
         message: `${client.name} bought a plan ${transaction.planName}`,
         transaction
     });
+});
+
+async function sortDataByDate(symbolData) {
+    return symbolData.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+const csts = async (plansData) => {
+    let responseData = [];
+    for (let planData of plansData) {
+        let results = [];
+        for (let stockData of planData.stocks) {
+            let { symbol, qty, price: avgPrice } = stockData;
+
+            if (!(symbol && qty && avgPrice)) {
+                return next(new AppError('Missing data in stocks information.', 404));
+            }
+
+            let symbolData = await Stocks.findOne({ symbol }).lean();
+            if (symbolData) {
+                let sortedData = await sortDataByDate(symbolData.data);
+                let currentPrice = sortedData[0]?.price || 0;
+                let previousClose = sortedData[1]?.price || 0;
+                let closePrice = sortedData[0]?.price || 0;
+
+                let todayChangePercent = 0;
+                let totalChangePercent = ((closePrice - avgPrice) / avgPrice) * 100;
+                if (currentPrice !== 0 && previousClose !== 0) {
+                    todayChangePercent = ((currentPrice - previousClose) / previousClose) * 100;
+                    totalChangePercent = ((currentPrice - avgPrice) / avgPrice) * 100;
+                }
+
+                results.push({
+                    symbol,
+                    todayChangePercent: todayChangePercent.toFixed(2),
+                    totalChangePercent: totalChangePercent.toFixed(2),
+                    currentValue: (qty * currentPrice).toFixed(2)
+                });
+            } else {
+                results.push({
+                    symbol,
+                    todayChangePercent: 'N/A',
+                    totalChangePercent: 'N/A',
+                    currentValue: 'N/A'
+                });
+            }
+        }
+
+        let totalCurrentValue = results.reduce((acc, stock) => acc + parseFloat(stock.currentValue || 0), 0);
+        responseData.push({
+            planName: planData.planName,
+            individualStocks: results,
+            totalCurrentGains: (((totalCurrentValue + parseFloat(planData.cash || 0) - parseFloat(planData.startVal || 0)) / Math.max(parseFloat(planData.startVal || 1), 1)) * 100).toFixed(2),
+            totalCurrentValue: (totalCurrentValue + parseFloat(planData.cash || 0)).toFixed(2),
+            initialValue: parseFloat(planData.startVal || 0).toFixed(2)
+        });
+    }
+
+    return responseData;
+}
+
+function processPlansData(responseData, planData) {
+    const tbl_data = planData.map(plan => {
+        const responseEntry = responseData.find(response => response.planName === plan.planName);
+
+        if (responseEntry) {
+            const currentValue = parseFloat(responseEntry.totalCurrentValue);
+            const avgPrice = plan.avgPrice;
+            const profitPercent = ((currentValue - avgPrice) / avgPrice) * 100;
+
+            return {
+                planName: plan.planName,
+                _id: plan._id,
+                profit_percent: profitPercent.toFixed(2)
+            };
+        }
+
+        return null;
+    }).filter(entry => entry !== null);
+
+    return tbl_data;
+}
+
+exports.getReturns = asyncErrorHandler(async (req, res, next) => {
+    try {
+        const client = await Client.findOne({ userIdCredentials: req.user._id });
+
+        if (!client) {
+            return res.status(404).json({ status: 'fail', message: 'Client not found' });
+        }
+
+        const planData = client.planData;
+        const boughtPlanIds = client.boughtPlanIds;
+
+        const allPlans = await Plan.find();
+
+        const filteredPlans = allPlans.filter(plan => boughtPlanIds.includes(plan._id.toString()));
+
+        const mappedData = filteredPlans.map(item => ({
+            planName: item.planName,
+            stocks: item.stocks,
+            startVal: item.minInvestmentAmount,
+            cash: item.cash
+        }));
+
+        const datu = await csts(mappedData);
+
+        const response = processPlansData(datu, planData);
+
+        res.status(200).json({
+            status: 'success',
+            response
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 exports.getFreeVsPremInvestedAmt = asyncErrorHandler(async (req, res, next) => {
