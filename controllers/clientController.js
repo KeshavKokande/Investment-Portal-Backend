@@ -5,8 +5,9 @@ const Advisor = require("../models/advisorModel");
 const Plan = require("../models/plansModel");
 const Transaction = require("../models/transactionModel");
 const Notification = require("../models/notificationModel");
+const { triggerNotification } = require("../utils/notification");
 
-const notification = require("./../utils/notification");
+// const notification = require("./../utils/notification");
 const { interestingFinancialInvestmentFact } = require("./../utils/getPlanDescrpGenAI");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const AppError = require('../utils/appError');
@@ -183,7 +184,7 @@ exports.buyASubscription = asyncErrorHandler(async (req, res, next) => {
 
     await plan.save();
 
-    notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
+    await triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
     res.status(201).json({
         status: 'success',
@@ -270,7 +271,7 @@ exports.investPlan = asyncErrorHandler(async (req, res, next) => {
     await client.save();
 
 
-    notification.triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
+    await triggerNotification(`${client.name} bought your plan, ${plan.planName}`, client.userIdCredentials, advisor.userIdCredentials);
     
     res.status(201).json({
         status: 'success',
