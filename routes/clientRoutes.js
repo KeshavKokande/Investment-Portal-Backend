@@ -27,4 +27,5 @@ router.get('/get-all-notifications', authController.protect, authController.rest
 router.get('/get-all-investedPlans', authController.protect, authController.restrictTo('client'), clientController.investedPlans);
 router.get('/get-transactions', authController.protect, authController.restrictTo('client'), clientController.allTransactions);
 router.get('/view-notification/:notificationId', authController.protect, authController.restrictTo('client'), notification.viewNotification);
+router.get('/get-returns', authController.protect, authController.restrictTo('client'), clientController.getReturns);
 module.exports = router;
