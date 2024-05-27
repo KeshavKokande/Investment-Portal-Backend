@@ -632,7 +632,7 @@ exports.getAllNotification = asyncErrorHandler(async (req, res, next) => {
 exports.allTransactions = asyncErrorHandler(async (req, res, next) => {
     const client = await Client.findOne({ userIdCredentials: req.user._id });
 
-    const transactions = await Transaction.find({ clientId: client._id });
+    const transactions = await Transaction.find({ clientId: client._id }).sort({ 'date': -1, 'investedAmount': -1 });
 
     const AdvisorIds = transactions.map(transaction => {
         return transaction.advisorId

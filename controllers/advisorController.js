@@ -138,7 +138,7 @@ exports.getOwndetails = asyncErrorHandler(async (req, res, next) => {
 exports.getTransactions = asyncErrorHandler(async (req, res, next) => {
     const advisor = await Advisor.findOne({ userIdCredentials: req.user._id });
 
-    const transactions = await Transaction.find({ advisorId: advisor._id });
+    const transactions = await Transaction.find({ advisorId: advisor._id }).sort({ 'date': -1, 'investedAmount': -1 });
 
     res.status(200).json({
         status: 'success',
